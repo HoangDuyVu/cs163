@@ -5,7 +5,7 @@
 //  Created by Aquafjna on 22/7/24.
 //
 
-#include "node.hpp"
+#include <node.hpp>
 
 void node::build(Shape _shape, Vector2 _postion, Vector2 _size, Color _color,bool _mouse) {
     shape =_shape;

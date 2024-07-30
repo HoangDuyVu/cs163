@@ -20,16 +20,15 @@ void Activities() {
         if (x == 0) {
            // std::cout << "co";
             pos = HEAPTREE;
+            heaptree.init();
+            _create.init({184,496});
+            _insert.init({184,536});
             return ;
         }
     }
 
     if (pos == HEAPTREE) {
-        int x = heaptree.UpdatePressOn();
-        if (x != -1) {
-            pos = MENU;
-            return ;
-        }
+        heaptree.Activity();
     }
 }
 

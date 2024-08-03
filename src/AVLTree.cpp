@@ -1,14 +1,15 @@
 #include <iostream>
 #include <raylib.h>
-#include <HeapTree.hpp>
+#include <AVLTree.hpp>
 #include <variable.hpp>
 #include <ViewInApp.hpp>
 #include <activities.hpp>
 #include <variable.hpp>
 #include <random>
 
-void HeapTree::init(){
-    heap = BinaryHeap(30);
+
+void AVLTree::init(){
+    avl = BinaryTreeAVL(Limitnode);
     Animation.clear();
     AnimationEdge.clear();
     Unre.clear();
@@ -45,7 +46,7 @@ void HeapTree::init(){
     sel_i = 0;
 }
 
-int HeapTree::UpdatePressOn(){
+int AVLTree::UpdatePressOn(){
     bool Press = 0;
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) Press = 1;
     int res = viewapp.UpdatePressOn(Press);
@@ -57,29 +58,33 @@ int HeapTree::UpdatePressOn(){
     return -1;
 }
 
-Vector2 HeapTree::NewPos2D(Vector2 A,Vector2 B,float g) {
+Vector2 AVLTree::NewPos2D(Vector2 A,Vector2 B,float g) {
     return {A.x + (B.x - A.x)*g,A.y + (B.y - A.y)*g};
 }
 
-float HeapTree::NewPos1D(float x, float y, float g) {
+float AVLTree::NewPos1D(float x, float y, float g) {
     return x + (y - x)*g;
 }
 
-void HeapTree::DrawAnimation(std::vector<Transforms> f,double g){
-    for (Transforms v : f) {
+void AVLTree::DrawAnimation(std::vector<Transforms2> f,double g){
+    for (Transforms2 v : f) {
+        if (!v.v.Notdeath) continue;
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         NewA = std::max(NewA,0);
 
         if (v.v.color != v.u.color) {
-            DrawVertex(NewPostion,v.u.radius,v.u.val,v.u.color,255);
+            DrawVertex(NewPostion,v.u.radius,v.u.key,v.u.color,255);
         }
-            DrawVertex(NewPostion,v.u.radius,v.v.val,v.v.color,NewA);
+            DrawVertex(NewPostion,v.u.radius,v.v.key,v.v.color,NewA);
     }
 }
 
-void HeapTree::DrawAnimationEdge(std::vector<TransformsEdge> f,double g){
+void AVLTree::DrawAnimationEdge(std::vector<TransformsEdge> f,double g){
+    int d = 0;
     for (TransformsEdge v : f) {
+        if (!Animation[pos_ani][d].v.Notdeath) continue;
+        d++;
         Vector2 NewPostionX = NewPos2D(v.u.PostionX,v.v.PostionX,g);
         Vector2 NewPostionY = NewPos2D(v.u.PostionY,v.v.PostionY,g);
         Vector2 NewPostionVal = NewPos2D(v.u.PostionVal,v.v.PostionVal,g);
@@ -88,11 +93,11 @@ void HeapTree::DrawAnimationEdge(std::vector<TransformsEdge> f,double g){
 
         NewPostionVal.y += 34;
         DrawEdge(NewPostionX,NewPostionY,v.v.val,0,NewA);
-        DrawVertex(NewPostionVal,17,v.v.val,4,NewA);
+      //  DrawVertex(NewPostionVal,17,v.v.val,4,NewA);
     }
 }
 
-void HeapTree::UpdatePostionNodePer(){
+void AVLTree::UpdatePostionNodePer(){
 
     if (NodePersistent.CheckMouse(GetMousePosition(),1) && IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
         checkNodePer = 1; 
@@ -128,7 +133,7 @@ void HeapTree::UpdatePostionNodePer(){
 
 }
 
-void HeapTree::SolveRemote(){
+void AVLTree::SolveRemote(){
 
     if (pause == 0) {
         button_select &v = remote[4];
@@ -168,7 +173,7 @@ void HeapTree::SolveRemote(){
         if (v.CheckPress(GetMousePosition(),2,1)) k = d;
         else d++;
 
-        std::cout << k << "\n";
+    //    std::cout << k << "\n";
 
         if (k == 1) {
             if (pos_ani != 0) {
@@ -197,7 +202,7 @@ void HeapTree::SolveRemote(){
                 else {
                     Animation = Unre[Pos_unre];
                     AnimationEdge = UnreEdge[Pos_unre];
-                    heap = UnreHeap[Pos_unre];
+                    avl = UnreAVL[Pos_unre];
                     pause = 1;
                     pos_ani = Animation.size() - 1;
                     TotalTime = deltaTime;
@@ -210,7 +215,7 @@ void HeapTree::SolveRemote(){
                 Pos_unre++;
                 Animation = Unre[Pos_unre];
                 AnimationEdge = UnreEdge[Pos_unre];
-                heap = UnreHeap[Pos_unre];
+                avl = UnreAVL[Pos_unre];
                 pause = 1;
                 pos_ani = Animation.size() - 1;
                 TotalTime = deltaTime - deltaTime/10;
@@ -234,17 +239,16 @@ void HeapTree::SolveRemote(){
     if (pause == 2)  remote[6].DrawBasic(0.6);
 }
 
-void HeapTree::draw(){
+void AVLTree::draw(){
     SolveRemote();
     Vector2 Mouse = GetMousePosition();
-    select.draw();
     UpdatePostionNodePer();
     Notification();
    // DrawVertex(Vector2 {500,300},25,10,1,255);
     double NowTime = GetTime();
 
    if (CheckNotification == 1) {
-        std::cout << "co\n";
+       // std::cout << "co\n";
         TimeNotification +=  NowTime - LastTime;
    } 
 
@@ -301,9 +305,11 @@ void HeapTree::draw(){
     textBuffer[Iz + 1] = 'x';
     textBuffer[Iz + 2] = '\0';
     DrawTextEx(customFont,textBuffer,{1356,762},23,0,{220,249,243,255});
+
+    select.draw();
 }
 
-int HeapTree::Select::checkPressOn(bool Press){
+int AVLTree::Select::checkPressOn(bool Press){
             if (Press && CheckMouse(GetMousePosition(),1)) return 0;
             int d = 1;
 
@@ -338,12 +344,12 @@ int HeapTree::Select::checkPressOn(bool Press){
                             return 201;
                         }
 
-                        if (v.kind == Extract && _extract.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
+                        if (v.kind == Search && _search.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
                             v.press = 0;
                             KIND = 0;
                             int n = 0;
-                            for (int i = 0 ; _extract.a[i] != '\0' ; i++)
-                                n = n * 10 + _extract.a[i] - '0';
+                            for (int i = 0 ; _search.a[i] != '\0' ; i++)
+                                n = n * 10 + _search.a[i] - '0';
                             sel_k = n;
                             return 202;
                         }
@@ -378,9 +384,9 @@ int HeapTree::Select::checkPressOn(bool Press){
             return -1;
         }
 
-void HeapTree::Activity(){
+void AVLTree::Activity(){
 
-    LimitNode = heap.size;
+    LimitNode = avl.size;
     int g = UpdatePressOn();
     if (g == 101 || g == 102) {
         pos = MENU;
@@ -405,38 +411,47 @@ void HeapTree::Activity(){
         insert(sel_v);
     }
     else if (g == 202) {
-        ExtractMin(std::min(sel_k,heap.size));
+        search(sel_k);
     }
     else if (g == 203) {
-        deletee(sel_i);
+       // deletee(sel_i);
     }
     else if (g == 204){
-        update(sel_i,sel_v);
+      //  update(sel_i,sel_v);
     }
 
     if (g >= 1 && g <= 5) {
         SelectPress(g - 1);
     }
 
-    if (g != -1) std::cout << g << "\n";
+   // if (g != -1) std::cout << g << "\n";
 }
 
-void HeapTree::SelectPress(int pos) {
+void AVLTree::SelectPress(int pos) {
     select.sel[pos].press ^= 1;
     if (select.sel[pos].press)
     for (int i = 0 ; i < 5 ; i++)
         if (i != pos) select.sel[i].press = 0;
 }
 
-void HeapTree::create(int n){
-    heap = BinaryHeap(30);
+void AVLTree::create(int n){
+    avl = BinaryTreeAVL(Limitnode);
     Animation.clear();
     AnimationEdge.clear();
     for (int i = 0 ; i < n ; i++) {
         int x = rng() % 100;
-        heap.Insert(x,0,Animation,AnimationEdge);
+        avl.root = avl.Insert(avl.root,-1,0,x,Animation,AnimationEdge);
     }
 
+  //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
+   // std::cout << "t43345 " << x << "\n";
+
+    std::vector <Transforms2> f(Limitnode);
+    std::vector <TransformsEdge> g(Limitnode);
+    avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
+
+    Animation.push_back(f);
+    AnimationEdge.push_back(g);
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -445,18 +460,84 @@ void HeapTree::create(int n){
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
         UnreEdge.pop_back();
-        UnreHeap.pop_back();
+        UnreAVL.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-    UnreHeap.push_back(heap);
+    UnreAVL.push_back(avl);
 }
 
 
-void HeapTree::Notification(){
+void AVLTree::insert(int v){
+
+    if (avl.find() == -1) {
+        CheckNotification = 1;
+        TimeNotification = 0.0f;
+        return ;
+    }
+    Animation.clear();
+    AnimationEdge.clear();
+
+  //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
+   // std::cout << "t43345 " << x << "\n";
+
+   avl.Insert(avl.root,-1,0,v,Animation,AnimationEdge);
+
+    std::vector <Transforms2> f(Limitnode);
+    std::vector <TransformsEdge> g(Limitnode);
+    avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
+
+    Animation.push_back(f);
+    AnimationEdge.push_back(g);
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        UnreEdge.pop_back();
+        UnreAVL.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    UnreEdge.push_back(AnimationEdge);
+    UnreAVL.push_back(avl);
+}
+
+void AVLTree::search(int v){
+    Animation.clear();
+    AnimationEdge.clear();
+
+  //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
+   // std::cout << "t43345 " << x << "\n";
+
+    avl.search(avl.root,-1,0,v,Animation,AnimationEdge);
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        UnreEdge.pop_back();
+        UnreAVL.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    UnreEdge.push_back(AnimationEdge);
+    UnreAVL.push_back(avl);
+}
+
+
+void AVLTree::Notification(){
 
     if (!CheckNotification) return ;
     const char *message = "You have reached the node of the tree";
@@ -471,114 +552,4 @@ void HeapTree::Notification(){
     DrawTextEx(customFont, message, position, fontSize, spacing, ConstColor2);
 
     LastTime = GetTime();
-}
-
-void HeapTree::insert(int val) {
-
-    if (heap.size == heap.capacity) {
-        CheckNotification = 1;
-        TimeNotification = 0.0f;
-        return ;
-    }
-
-    pause = 0;
-    pos_ani = 0;
-    LastTime = GetTime();
-    TotalTime = 0;
-    Animation.clear();
-    AnimationEdge.clear();
-
-    heap.Insert(val,1,Animation,AnimationEdge);
-   // std::cout << Animation[0].size() << " " << AnimationEdge[0].size() << "\n";
-
-    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
-        Unre.pop_back();
-        UnreEdge.pop_back();
-        UnreHeap.pop_back();
-    }
-
-    Pos_unre++;
-
-    Unre.push_back(Animation);
-    UnreEdge.push_back(AnimationEdge);
-    UnreHeap.push_back(heap);
-}
-
-void HeapTree::ExtractMin(int k) {
-
-    if (k == 0) return ;
-    std::cout << "ExtractMin" << " " << k << "\n";
-    pause = 0;
-    pos_ani = 0;
-    LastTime = GetTime();
-    TotalTime = 0;
-    Animation.clear();
-    AnimationEdge.clear();
-
-    for (int i = 1 ; i <= k ; i++)
-    heap.ExtractMin(Animation,AnimationEdge);
-   // std::cout << Animation[0].size() << " " << AnimationEdge[0].size() << "\n";
-
-    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
-        Unre.pop_back();
-        UnreEdge.pop_back();
-        UnreHeap.pop_back();
-    }
-
-    Pos_unre++;
-
-    Unre.push_back(Animation);
-    UnreEdge.push_back(AnimationEdge);
-    UnreHeap.push_back(heap);
-}
-
-void HeapTree::deletee(int i) {
-    if (i >= heap.size) return ;
-    pause = 0;
-    pos_ani = 0;
-    LastTime = GetTime();
-    TotalTime = 0;
-    Animation.clear();
-    AnimationEdge.clear();
-
-    heap.Delete(i,Animation,AnimationEdge);
-    heap.ExtractMin(Animation,AnimationEdge);
-   // std::cout << Animation[0].size() << " " << AnimationEdge[0].size() << "\n";
-
-    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
-        Unre.pop_back();
-        UnreEdge.pop_back();
-        UnreHeap.pop_back();
-    }
-
-    Pos_unre++;
-
-    Unre.push_back(Animation);
-    UnreEdge.push_back(AnimationEdge);
-    UnreHeap.push_back(heap);
-}
-
-void HeapTree::update(int i,int val) {
-    if (i >= heap.size) return ;
-    pause = 0;
-    pos_ani = 0;
-    LastTime = GetTime();
-    TotalTime = 0;
-    Animation.clear();
-    AnimationEdge.clear();
-
-    heap.Update(i,val,Animation,AnimationEdge);
-   // std::cout << Animation[0].size() << " " << AnimationEdge[0].size() << "\n";
-
-    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
-        Unre.pop_back();
-        UnreEdge.pop_back();
-        UnreHeap.pop_back();
-    }
-
-    Pos_unre++;
-
-    Unre.push_back(Animation);
-    UnreEdge.push_back(AnimationEdge);
-    UnreHeap.push_back(heap);
 }

@@ -5,7 +5,9 @@
 #include <variable.hpp>
 #include <ViewMenu.hpp>
 #include <ViewInApp.hpp>
+#include <HeapTree.hpp>
 #include <iostream>
+
 
 extern Menu  menu;
 extern ViewInApp viewapp;

@@ -12,6 +12,9 @@ class ViewInApp {
 
 private:
     std::vector <button_select> Botton;
+    button_select Speed,NodeSpeed;
+    bool checkNodeSpeed;
+    int gtt;
 public:
     void init();
     void draw();

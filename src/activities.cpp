@@ -3,15 +3,19 @@
 #include <ViewMenu.hpp>
 #include <ViewInApp.hpp>
 #include <HeapTree.hpp>
+#include <AVLTree.hpp>
 #include <iostream>
 
 Menu  menu;
 ViewInApp viewapp;
 HeapTree heaptree;
+AVLTree avltree;
+
 void init(){
     menu.init();
     viewapp.init();
     heaptree.init();
+    avltree.init();
 }
 
 void Activities() {
@@ -21,14 +25,20 @@ void Activities() {
            // std::cout << "co";
             pos = HEAPTREE;
             heaptree.init();
-            _create.init({184,496});
-            _insert.init({184,536});
             return ;
+        }
+        if (x == 1) {
+            pos = AVLTREE;
+            avltree.init();
         }
     }
 
     if (pos == HEAPTREE) {
         heaptree.Activity();
+    }
+
+    if (pos == AVLTREE) {
+        avltree.Activity();
     }
 }
 
@@ -40,5 +50,9 @@ void draw() {
     else if (pos == HEAPTREE) {
         viewapp.draw();
         heaptree.draw();
+    }
+    else if (pos == AVLTREE) {
+        viewapp.draw();
+        avltree.draw();
     }
 }

@@ -8,6 +8,7 @@
 
 int main(void) {
     InitWindow(screenWidth, screenHeight, "CS 162");
+    SetTargetFPS(60);
     init_bg();
     init();
     pos = MENU;

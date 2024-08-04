@@ -4,18 +4,22 @@
 #include <ViewInApp.hpp>
 #include <HeapTree.hpp>
 #include <AVLTree.hpp>
+#include <Hashtable.hpp>
 #include <iostream>
 
 Menu  menu;
 ViewInApp viewapp;
 HeapTree heaptree;
 AVLTree avltree;
+Hashtable hashtable;
+
 
 void init(){
     menu.init();
     viewapp.init();
     heaptree.init();
     avltree.init();
+    hashtable.init();
 }
 
 void Activities() {
@@ -31,6 +35,11 @@ void Activities() {
             pos = AVLTREE;
             avltree.init();
         }
+
+        if (x == 3) {
+            pos = HASHTABLE;
+            hashtable.init();
+        }
     }
 
     if (pos == HEAPTREE) {
@@ -39,6 +48,10 @@ void Activities() {
 
     if (pos == AVLTREE) {
         avltree.Activity();
+    }
+    
+    if (pos == HASHTABLE) {
+        hashtable.Activity();
     }
 }
 
@@ -54,5 +67,9 @@ void draw() {
     else if (pos == AVLTREE) {
         viewapp.draw();
         avltree.draw();
+    }
+    else if (pos == HASHTABLE) {
+        viewapp.draw();
+        hashtable.draw();
     }
 }

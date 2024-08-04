@@ -1,6 +1,6 @@
 #include <iostream>
 #include <raylib.h>
-#include <AVLTree.hpp>
+#include <Hashtable.hpp>
 #include <variable.hpp>
 #include <ViewInApp.hpp>
 #include <activities.hpp>
@@ -8,7 +8,7 @@
 #include <random>
 
 
-void AVLTree::init(){
+void Hashtable::init(){
     avl = BinaryTreeAVL(Limitnode);
     Animation.clear();
     AnimationEdge.clear();
@@ -46,7 +46,7 @@ void AVLTree::init(){
     sel_i = 0;
 }
 
-int AVLTree::UpdatePressOn(){
+int Hashtable::UpdatePressOn(){
     bool Press = 0;
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) Press = 1;
     int res = viewapp.UpdatePressOn(Press);
@@ -58,15 +58,15 @@ int AVLTree::UpdatePressOn(){
     return -1;
 }
 
-Vector2 AVLTree::NewPos2D(Vector2 A,Vector2 B,float g) {
+Vector2 Hashtable::NewPos2D(Vector2 A,Vector2 B,float g) {
     return {A.x + (B.x - A.x)*g,A.y + (B.y - A.y)*g};
 }
 
-float AVLTree::NewPos1D(float x, float y, float g) {
+float Hashtable::NewPos1D(float x, float y, float g) {
     return x + (y - x)*g;
 }
 
-void AVLTree::DrawAnimation(std::vector<Transforms2> f,double g){
+void Hashtable::DrawAnimation(std::vector<Transforms2> f,double g){
     for (Transforms2 v : f) {
         if (!v.v.Notdeath) continue;
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
@@ -130,7 +130,7 @@ void AVLTree::DrawAnimation(std::vector<Transforms2> f,double g){
     }
 }
 
-void AVLTree::DrawAnimationEdge(std::vector<TransformsEdge> f,double g){
+void Hashtable::DrawAnimationEdge(std::vector<TransformsEdge> f,double g){
     int d = 0;
     for (TransformsEdge v : f) {
         if (!Animation[pos_ani][d].v.Notdeath) continue;
@@ -151,7 +151,7 @@ void AVLTree::DrawAnimationEdge(std::vector<TransformsEdge> f,double g){
     }
 }
 
-void AVLTree::UpdatePostionNodePer(){
+void Hashtable::UpdatePostionNodePer(){
 
     if (NodePersistent.CheckMouse(GetMousePosition(),1) && IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
         checkNodePer = 1; 
@@ -187,7 +187,7 @@ void AVLTree::UpdatePostionNodePer(){
 
 }
 
-void AVLTree::SolveRemote(){
+void Hashtable::SolveRemote(){
 
     if (pause == 0) {
         button_select &v = remote[4];
@@ -293,7 +293,7 @@ void AVLTree::SolveRemote(){
     if (pause == 2)  remote[6].DrawBasic(0.6);
 }
 
-void AVLTree::draw(){
+void Hashtable::draw(){
     SolveRemote();
     Vector2 Mouse = GetMousePosition();
     UpdatePostionNodePer();
@@ -363,7 +363,7 @@ void AVLTree::draw(){
     select.draw();
 }
 
-int AVLTree::Select::checkPressOn(bool Press){
+int Hashtable::Select::checkPressOn(bool Press){
             if (Press && CheckMouse(GetMousePosition(),1)) return 0;
             int d = 1;
 
@@ -438,7 +438,7 @@ int AVLTree::Select::checkPressOn(bool Press){
             return -1;
         }
 
-void AVLTree::Activity(){
+void Hashtable::Activity(){
 
     LimitNode = avl.GetSize();
     int g = UpdatePressOn();
@@ -481,14 +481,14 @@ void AVLTree::Activity(){
    // if (g != -1) std::cout << g << "\n";
 }
 
-void AVLTree::SelectPress(int pos) {
+void Hashtable::SelectPress(int pos) {
     select.sel[pos].press ^= 1;
     if (select.sel[pos].press)
     for (int i = 0 ; i < 5 ; i++)
         if (i != pos) select.sel[i].press = 0;
 }
 
-void AVLTree::create(int n){
+void Hashtable::create(int n){
     avl = BinaryTreeAVL(Limitnode);
     Animation.clear();
     AnimationEdge.clear();
@@ -525,7 +525,7 @@ void AVLTree::create(int n){
 }
 
 
-void AVLTree::insert(int v){
+void Hashtable::insert(int v){
 
     if (avl.find() == -1) {
         CheckNotification = 1;
@@ -564,7 +564,7 @@ void AVLTree::insert(int v){
     UnreAVL.push_back(avl);
 }
 
-void AVLTree::search(int v){
+void Hashtable::search(int v){
     Animation.clear();
     AnimationEdge.clear();
 
@@ -590,7 +590,7 @@ void AVLTree::search(int v){
     UnreAVL.push_back(avl);
 }
 
-void AVLTree::Select(int k){
+void Hashtable::Select(int k){
 
     if (k > avl.GetSize()) return ;
     Animation.clear();
@@ -617,7 +617,7 @@ void AVLTree::Select(int k){
 }
 
 
-void AVLTree::Notification(){
+void Hashtable::Notification(){
 
     if (!CheckNotification) return ;
     const char *message = "You have reached the node of the tree";

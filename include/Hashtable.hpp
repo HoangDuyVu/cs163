@@ -1,14 +1,13 @@
 
-#ifndef AVLTree_hpp
-#define AVLTree_hpp
+#ifndef Hashtable_hpp
+#define Hashtable_hpp
 #include <raylib.h>
 #include <variable.hpp>
 #include <ViewInApp.hpp>
 #include <activities.hpp>
 #include <iostream>
 #include <vector>
-
-class AVLTree {
+class Hashtable {
 
 private:
     struct Select
@@ -685,31 +684,16 @@ private:
         int Af;
         int color;
         int key;
-        int left;
-        int right;
-        int parent;
-        bool Notdeath;
-        int height; 
-        int f;
-        int rank;
-        int drawf;
-        int drawbalance;
-        int drawPostion;
-        int drawrank;
-        int balance;
+        bool root;
         Vertex2() {
-            Notdeath = 0;
+            root = 0;
         }
 
         Vertex2(Vector2 Postion,float radius, int color,int val,bool death,int height,int left,int right):
         Postion(Postion),
         radius(radius),
         color(color),
-        key(val),
-        Notdeath(death),
-        height(height),
-        left(left),
-        right(right){}
+        key(val){}
     };
 
     struct Transforms2{
@@ -718,479 +702,25 @@ private:
         Transforms2(Vertex2 u,Vertex2 v): u(u), v(v) {}
     };
 
-    class BinaryTreeAVL{
-    public:
+    class HashTable {
+        int SizeN;
+        int SizeM;
+        std::vector <std::vector<Vertex2> > arr;
 
-        int capacity;
-        int size;
-        int root;
-        std::vector<Vertex2> arr;
-
-        BinaryTreeAVL(int cap = 0) {
-            capacity = cap; 
-            root = -1;
-            size = 0;
-            arr.resize(capacity);
+        HashTable(int n = 0,int m = 0) {
+            SizeN = n;
+            SizeM = m;
+            arr.resize(n);
         }
 
-        int GetSize() {
-            int d = 0;
-            for (int i = 0 ; i < capacity ; i++) 
-            if (arr[i].Notdeath) d++;
-            return d;
-        }
-
-        int find(){
-            for (int i = 0 ; i < capacity ; i++)
-            if (!arr[i].Notdeath) return i;
-            return -1;
-        }
-
-        int height(int id){
-            if (id == -1) return 0;
-            return arr[id].height;
-        }
-
-        int RightRotate(int id,int par,int pos,std::vector<std::vector<Transforms2> > &AnimationI,std::vector<std::vector <TransformsEdge> > &AnimationE) {
-
-            std::vector<Transforms2> anima(capacity);
-            std::vector<TransformsEdge> animaE(capacity);
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-            anima[id].u.color =  anima[id].v.color = 2;
-
-            int x = arr[id].left;
-            int T2 = arr[x].right;
-
-            animaE[T2].v.PostionX = arr[id].Postion;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-            animaE[T2].u = animaE[T2].v;
-            std::vector<Transforms2> Anima = anima;
-            std::vector<TransformsEdge> AnimaE = animaE;
-
-            arr[x].right = id;
-            arr[id].left = T2;
-            
-            if (par == -1) {
-                root = x;
-            }
-            else if (pos == 0) {
-                arr[par].left = x;
-            }
-            else arr[par].right = x;
-
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-
-            for (int i = 0 ; i < capacity ; i++) {
-                anima[i].u = Anima[i].v;
-                animaE[i].u = AnimaE[i].v;
-            }
-
-            anima[id].u.color =  anima[id].v.color = 2;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            for (int i = 0 ; i < capacity ; i++) {
-                anima[i].u = anima[i].v;
-                animaE[i].u = animaE[i].v;
-            }
-
-            anima[id].v.color = 2;
-            anima[id].u.Af = 255;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            arr[id].height = std::max(height(arr[id].left),height(arr[id].right)) + 1;
-            arr[x].height =  std::max(height(arr[x].left),height(arr[x].right)) + 1;
-            return x;
-        }
-
-        int LeftRotate(int id,int par,int pos,std::vector<std::vector<Transforms2> > &AnimationI,std::vector<std::vector <TransformsEdge> > &AnimationE) {
-            
-            std::vector<Transforms2> anima(capacity);
-            std::vector<TransformsEdge> animaE(capacity);
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-            anima[id].u.color =  anima[id].v.color = 2;
-
-            int x = arr[id].right;
-            int T2 = arr[x].left;
-
-            animaE[T2].v.PostionX = arr[id].Postion;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-            animaE[T2].u = animaE[T2].v;
-            std::vector<Transforms2> Anima = anima;
-            std::vector<TransformsEdge> AnimaE = animaE;
-
-            arr[x].left = id;
-            arr[id].right = T2;
-
-            if (par == -1) {
-                root = x;
-            }
-            else if (pos == 0) {
-                arr[par].left = x;
-            }
-            else arr[par].right = x;
-
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-
-            for (int i = 0 ; i < capacity ; i++) {
-                anima[i].u = Anima[i].v;
-                animaE[i].u = AnimaE[i].v;
-            }
-
-            anima[id].u.color =  anima[id].v.color = 2;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            for (int i = 0 ; i < capacity ; i++) {
-                anima[i].u = anima[i].v;
-                animaE[i].u = animaE[i].v;
-            }
-
-            anima[id].v.color = 2;
-            anima[id].u.Af = 255;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
+        void insert(int k,std::vector<std::vector<Transforms2> > &AnimationI,std::vector<std::vector <TransformsEdge> > &AnimationE) {
+            int k = k % SizeN;
+            if (arr[k].size() == SizeM) return ;
 
 
-            arr[id].height = std::max(height(arr[id].left),height(arr[id].right)) + 1;
-            arr[x].height =  std::max(height(arr[x].left),height(arr[x].right)) + 1;
-            return x;
-        }
-
-        int GetBanlance(int id){
-            return height(arr[id].left) - height(arr[id].right);
-        }
-
-        // x = 150  , y = 120 -> x += 80 , y += 80,
-
-        int FindRight (int node,int par,int left,int high, int deltaHigh,int deltaLeft) {
-
-            if (arr[node].left == -1) {
-                arr[node].Postion = {(float)left,(float)high};
-            }
-
-            if (arr[node].left == -1 && arr[node].right == -1) return left;
-            if (arr[node].left == -1) return FindRight(arr[node].right,node,left + deltaLeft,high + deltaHigh,deltaHigh,deltaLeft);
-
-            int x = FindRight(arr[node].left,node,left,high + deltaHigh,deltaHigh,deltaLeft);
-            arr[node].Postion = {(float) x + deltaLeft,(float) high};
-
-            if (arr[node].right == -1) return x + deltaLeft;
-
-            return FindRight(arr[node].right,node,x + 2*deltaLeft,high + deltaHigh,deltaHigh,deltaLeft);
-        }
-
-        void dfs(int id,int par,int l,int r,int h, int delta, std::vector<Transforms2> &g,std::vector <TransformsEdge> &f){
-
-
-            //if (arr[id].Notdeath) std::cout << "id = " << id << "\n";
-            arr[id].f = 1;
-            if (id == -1){
-                std::cout <<"coluontroi";
-                return ;
-            }
-
-
-            Vertex2 &u = arr[id];
-            u.Postion = {(float)((l + r) / 2.0),(float)h};
-            u.balance = GetBanlance(id);
-
-            if (u.left != -1) {
-                arr[id].f += arr[u.left].f;
-                dfs(u.left,id,l,(l + r)/2,h + delta,delta,g,f);
-            }
-
-            arr[id].rank = arr[id].f;
-            if (u.right != - 1){
-                arr[id].f += arr[u.right].f;
-                dfs(u.right,id,(l + r)/2,r,h + delta,delta,g,f);
-            }
-
-            g[id].u = g[id].v = u;
-            f[id].u = f[id].v = Edge(arr[par].Postion,u.Postion,u.Postion,0,id,255);
         }
 
 
-        int Insert(int node,int par,int pos, int key,std::vector<std::vector<Transforms2> > &AnimationI,std::vector<std::vector <TransformsEdge> > &AnimationE) {
-
-            std::vector<Transforms2> anima(capacity);
-            std::vector<TransformsEdge> animaE(capacity);
-
-            if (node == -1) {
-                node = find();
-                if (find() == -1) {
-                    std::cout << "hetcuu\n";
-                }
-
-                arr[node] = Vertex2({0,0},15,0,key,1,1,-1,-1);
-                arr[node].parent = par;
-                arr[node].Af = 255;
-                arr[node].drawf = 0;
-                arr[node].drawPostion = 0;
-                arr[node].drawrank = 0;
-                arr[node].drawbalance = 0;
-
-                if (par != -1 && par != node) {
-                    if (pos == 0) arr[par].left = node;
-                    else arr[par].right = node;
-                }
-
-                if (par == -1) root = node;
-
-                dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-             //   std::cerr << root << " " << node << " " << arr[node].Postion.x  << " " << arr[node].Postion.y << "\n";
-                anima[node].u.Af = 0;
-                anima[node].v.color = 2;
-                anima[node].u.color = 2;
-                animaE[node].u.Af = 0;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-
-
-                for (int i = 0 ; i < capacity ; i++){
-                    if (node != i){
-                        if (arr[i].color == 1) anima[i].u.Af = 0;
-                        anima[i].v.color = 0;
-                    }
-
-                    arr[i].color = 0;
-                }
-
-                animaE[node].u.Af = 255;
-                anima[node].u = anima[node].v;
-
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                return node;
-            }
-
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-            anima[node].u.Af = 0;
-            anima[node].v.color = 1;
-            arr[node].color = 1;
-            for (int i = 0 ; i < capacity ; i++)
-            if (arr[i].color != 0) {
-                animaE[i].u.color = animaE[i].v.color = 1;
-            }
-
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            anima[node].u = anima[node].v;
-
-            if (key < arr[node].key) {
-
-                animaE[arr[node].left].v.color = 1;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                arr[node].left = Insert(arr[node].left,node,0,key,AnimationI,AnimationE);
-            }
-            else if (key > arr[node].key) {
-                animaE[arr[node].right].v.color = 1;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                arr[node].right = Insert(arr[node].right,node,1,key,AnimationI,AnimationE);
-            }
-            else{
-                dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-
-
-                for (int i = 0 ; i < capacity ; i++){
-                        if (arr[i].color == 1) anima[i].u.Af = 0;
-                        anima[i].v.color = 0;
-                    arr[i].color = 0;
-                }
-
-                animaE[node].u.Af = 255;
-                anima[node].u = anima[node].v;
-
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                return node;
-            }
-
-            arr[node].height = std::max(height(arr[node].left),height(arr[node].right)) + 1;
-
-            int Balance = GetBanlance(node);
-
-
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-            anima[node].v.color = 2;
-            anima[node].u.Af = 0;
-            anima[node].v.drawbalance = 1;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            anima[node].u = anima[node].v;
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            if (Balance > 1 && key < arr[arr[node].left].key) {
-                return RightRotate(node,par,pos,AnimationI,AnimationE);
-            }
-
-            if (Balance < -1 && key > arr[arr[node].right].key) {
-                return LeftRotate(node,par,pos,AnimationI,AnimationE);
-            }
-
-
-            if (Balance > 1 && key > arr[arr[node].left].key) {
-                arr[node].left = LeftRotate(arr[node].left,node,0,AnimationI,AnimationE);
-                return  RightRotate(node,par,pos,AnimationI,AnimationE);
-            }
-
-            if (Balance < -1 && key < arr[arr[node].right].key) {
-                arr[node].right = RightRotate(arr[node].right,node,1,AnimationI,AnimationE);
-                return LeftRotate(node,par,pos,AnimationI,AnimationE);
-            }
-
-            return node;
-        }
-
-        void search(int node,int par,int pos, int key,std::vector<std::vector<Transforms2> > &AnimationI,std::vector<std::vector <TransformsEdge> > &AnimationE) {
-
-            std::vector<Transforms2> anima(capacity);
-            std::vector<TransformsEdge> animaE(capacity);
-
-            if (node == -1) {
-
-                dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-
-
-                for (int i = 0 ; i < capacity ; i++){
-                        if (arr[i].color == 1) anima[i].u.Af = 0;
-                        anima[i].v.color = 0;
-                    arr[i].color = 0;
-                }
-
-                // animaE[node].u.Af = 255;
-                // anima[node].u = anima[node].v;
-
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                return ;
-            }
-
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-            arr[node].color = 1;
-            for (int i = 0 ; i < capacity ; i++)
-            if (arr[i].color != 0) {
-                animaE[i].u.color = animaE[i].v.color = 1;
-            }
-
-            anima[node].v.color = 1;
-
-
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            for (int i = 0 ; i < capacity ; i++) 
-            anima[i].u = anima[i].v;
-
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            if (key < arr[node].key) {
-                animaE[arr[node].left].v.color = 1;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                search(arr[node].left,node,0,key,AnimationI,AnimationE);
-            }
-            else if (key > arr[node].key) {
-                animaE[arr[node].right].v.color = 1;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                search(arr[node].right,node,1,key,AnimationI,AnimationE);
-            }
-            else {
-                anima[node].u = anima[node].v;
-                anima[node].u.Af = 0;
-                anima[node].v.color = 2;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-
-
-                for (int i = 0 ; i < capacity ; i++){
-                    arr[i].color = 0;
-                }
-
-                return ;
-            }
-        }
-
-
-        void select(int node,int par,int pos, int k,std::vector<std::vector<Transforms2> > &AnimationI,std::vector<std::vector <TransformsEdge> > &AnimationE) {
-
-            std::vector<Transforms2> anima(capacity);
-            std::vector<TransformsEdge> animaE(capacity);
-
-            dfs(root,root,120,screenWidth - 120,100,60,anima,animaE);
-            arr[node].color = 1;
-
-            for (int i = 0 ; i < capacity ; i++)
-            if (arr[i].color != 0) {
-                animaE[i].u.color = animaE[i].v.color = 1;
-            }
-
-            anima[node].u.Af = 0;
-            anima[node].v.color = 1;
-            anima[node].v.drawrank = 1;
-
-
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            for (int i = 0 ; i < capacity ; i++) 
-            anima[i].u = anima[i].v;
-
-            if (arr[node].left != -1) {
-                anima[arr[node].left].v.drawf = 1;
-                anima[arr[node].left].u.Af = 0;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-            }
-
-            for (int i = 0 ; i < capacity ; i++) 
-            anima[i].u = anima[i].v;
-
-            AnimationI.push_back(anima);
-            AnimationE.push_back(animaE);
-
-            if (k == arr[node].rank)
-            {
-                anima[node].u = anima[node].v;
-                anima[node].u.Af = 0;
-                anima[node].v.color = 2;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-
-
-                for (int i = 0 ; i < capacity ; i++){
-                    arr[i].color = 0;
-                }
-
-                return ;
-            }
-            else 
-            if (k < arr[node].rank) {
-
-                animaE[arr[node].left].v.color = 1;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-
-                select(arr[node].left,node,0,k,AnimationI,AnimationE);
-            }
-            else {
-                animaE[arr[node].right].v.color = 1;
-                AnimationI.push_back(anima);
-                AnimationE.push_back(animaE);
-                select(arr[node].right,node,0,k - arr[node].rank,AnimationI,AnimationE);
-            }
-        }
-        
     };
 
 

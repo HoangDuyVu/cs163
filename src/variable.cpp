@@ -5,6 +5,7 @@ const int screenWidth = 1440;
 const int screenHeight = 810;
 const Color ConstColor1 = {97, 91, 174, 255};
 const Color ConstColor2 = {249, 150, 211,255};
+const int Limitnode = 40;
 
 int sel_n;
 int sel_v;
@@ -94,7 +95,19 @@ void DrawVertex(Vector2 Postion,float radius,int val, int kind_color,unsigned ch
     }
 }
 
+void DrawVertexText(Vector2 Postion,float radius,char *text, int fontSize,unsigned char a) {
+    Vector2 textSize = MeasureTextEx(customFont, text, fontSize, 0);
+    Vector2 textPosition = {
+        Postion.x - textSize.x / 2,
+        Postion.y - textSize.y / 2
+    };
+
+    DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(RED,1.0*a/255.0));
+}
+
+
 void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a) {
-    DrawLineEx(PostionX,PostionY,4.0f,{107,100,184,a});
+    if (kind_color == 0) DrawLineEx(PostionX,PostionY,4.0f,{107,100,184,a});
+    else if (kind_color == 1) DrawLineEx(PostionX,PostionY,6.0f,ConstColor2);
 }
 

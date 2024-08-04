@@ -11,6 +11,7 @@ extern const int screenWidth;
 extern const int screenHeight;
 extern const Color ConstColor1;
 extern const Color ConstColor2;
+extern const int Limitnode;
 
 extern Font customFont;
 extern double deltaTime;
@@ -27,7 +28,11 @@ extern Texture2D Logo;
 enum Pos{
     MENU,
     HEAPTREE,
-    AVLTREE
+    AVLTREE,
+    HASHTABLE,
+    TRIE,
+    GRAPH,
+    FOURTREE
 };
 
 enum Kind{
@@ -158,6 +163,7 @@ struct TransformsEdge{
 };
 
 void DrawVertex(Vector2 Postion,float radius,int val, int kind_color,unsigned char a);
+void DrawVertexText(Vector2 Postion,float radius,char *text, int fontSize,unsigned char a);
 void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a);
 
 

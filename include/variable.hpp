@@ -12,6 +12,7 @@ extern const int screenHeight;
 extern const Color ConstColor1;
 extern const Color ConstColor2;
 extern const int Limitnode;
+extern bool Loadfile;
 
 extern Font customFont;
 extern double deltaTime;
@@ -21,6 +22,7 @@ extern  int sel_v;
 extern  int sel_k;
 extern  int sel_i;
 extern  int LimitNode;
+extern char pathfile[40];
 
 
 extern Texture2D Logo;
@@ -32,7 +34,7 @@ enum Pos{
     HASHTABLE,
     TRIE,
     GRAPH,
-    FOURTREE
+    TTFTREE
 };
 
 enum Kind{
@@ -41,7 +43,8 @@ enum Kind{
     Delete,
     Extract,
     Update,
-    Search
+    Search,
+    file
 };
 
 extern Pos pos;
@@ -165,6 +168,7 @@ struct TransformsEdge{
 void DrawVertex(Vector2 Postion,float radius,int val, int kind_color,unsigned char a);
 void DrawVertexText(Vector2 Postion,float radius,char *text, int fontSize,unsigned char a);
 void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a);
+void DrawVertexRoot(Vector2 Postion,float radius,int val, int kind_color,unsigned char a);
 
 
 

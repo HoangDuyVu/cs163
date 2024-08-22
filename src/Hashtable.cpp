@@ -6,10 +6,11 @@
 #include <activities.hpp>
 #include <variable.hpp>
 #include <random>
+#include <fstream>
 
 
 void Hashtable::init(){
-    hashtable = HashTable(10,5);
+    hashtable = HashTable(10,8);
     Animation.clear();
     AnimationEdge.clear();
     Unre.clear();
@@ -72,11 +73,16 @@ void Hashtable::DrawAnimation(std::vector<Transforms2> f,double g){
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         NewA = std::max(NewA,0);
 
-        if (v.v.color != v.u.color) {
-            DrawVertex(NewPostion,v.u.radius,v.u.key,v.u.color,255);
+        if (v.v.root) {
+            DrawVertexRoot(NewPostion,v.u.radius,v.u.key,v.v.color,NewA);
+        } else {
+
+            if (v.v.color != v.u.color) {
+                DrawVertex(NewPostion,v.u.radius,v.u.key,v.u.color,255);
+            }
+            
+            DrawVertex(NewPostion,v.u.radius,v.v.key,v.v.color,NewA);
         }
-        
-       DrawVertex(NewPostion,v.u.radius,v.v.key,v.v.color,NewA);
     }
 }
 
@@ -107,7 +113,7 @@ void Hashtable::UpdatePostionNodePer(){
         checkNodePer = 1; 
         if (gtt == -1e8)
         gtt = GetMousePosition().x - NodePersistent.Postion.x;
-     //   std::cout << gtt << "\n";
+     //   // std::cout << gtt << "\n";
     }
     
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -116,15 +122,15 @@ void Hashtable::UpdatePostionNodePer(){
     }
 
     if (checkNodePer){
-     //   std::cout << "check";
+     //   // std::cout << "check";
             NodePersistent.Postion.x = GetMousePosition().x - gtt;
-         //   std::cout << NodePersistent.Postion.x << "\n";
+         //   // std::cout << NodePersistent.Postion.x << "\n";
             if (NodePersistent.Postion.x < Persistent.Postion.x) 
                 NodePersistent.Postion.x = Persistent.Postion.x;
 
             if (NodePersistent.Postion.x + NodePersistent.Size.x > Persistent.Postion.x + Persistent.Size.x - 1) 
                 NodePersistent.Postion.x = Persistent.Postion.x + Persistent.Size.x - NodePersistent.Size.x - 1;
-          //  std::cout << NodePersistent.Postion.x << "\n";
+          //  // std::cout << NodePersistent.Postion.x << "\n";
 
         float TotalPer = Persistent.Size.x - NodePersistent.Size.x;
         float deltaPer = TotalPer/Animation.size();
@@ -143,7 +149,7 @@ void Hashtable::SolveRemote(){
         button_select &v = remote[4];
         if (v.CheckPress(GetMousePosition(),2,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
             pause = 1;
-           // std::cout << "hahahaaa";
+           // // std::cout << "hahahaaa";
 
         }
     }
@@ -177,7 +183,7 @@ void Hashtable::SolveRemote(){
         if (v.CheckPress(GetMousePosition(),2,1)) k = d;
         else d++;
 
-    //    std::cout << k << "\n";
+    //    // std::cout << k << "\n";
 
         if (k == 1) {
             if (pos_ani != 0) {
@@ -206,7 +212,7 @@ void Hashtable::SolveRemote(){
                 else {
                     Animation = Unre[Pos_unre];
                     AnimationEdge = UnreEdge[Pos_unre];
-            //        avl = UnreAVL[Pos_unre];
+                    hashtable = UnreHash[Pos_unre];
                     pause = 1;
                     pos_ani = Animation.size() - 1;
                     TotalTime = deltaTime;
@@ -219,7 +225,7 @@ void Hashtable::SolveRemote(){
                 Pos_unre++;
                 Animation = Unre[Pos_unre];
                 AnimationEdge = UnreEdge[Pos_unre];
-       //         avl = UnreAVL[Pos_unre];
+                hashtable = UnreHash[Pos_unre];
                 pause = 1;
                 pos_ani = Animation.size() - 1;
                 TotalTime = deltaTime - deltaTime/10;
@@ -252,11 +258,11 @@ void Hashtable::draw(){
     double NowTime = GetTime();
 
    if (CheckNotification == 1) {
-       // std::cout << "co\n";
+       // // std::cout << "co\n";
         TimeNotification +=  NowTime - LastTime;
    } 
 
-   //std::cout << TimeNotification << " " << deltaTime << " " << TotalTime << " " << "\n";
+   //// std::cout << TimeNotification << " " << deltaTime << " " << TotalTime << " " << "\n";
 
     if (TimeNotification >= 0.00005f) {
         CheckNotification = 0;
@@ -270,7 +276,7 @@ void Hashtable::draw(){
             TotalTime += NowTime - LastTime;
         }
 
-       // std::cout << NowTime - LastTime << "\n";
+       // // std::cout << NowTime - LastTime << "\n";
         if (TotalTime > deltaTime && pause != 1) {
             if (pos_ani + 1 < Animation.size()) {
                 pos_ani++;
@@ -333,7 +339,12 @@ int Hashtable::Select::checkPressOn(bool Press){
                             for (int i = 0 ; _create.a[i] != '\0' ; i++)
                                 n = n * 10 + _create.a[i] - '0';
                             sel_n = n;
-                           // std::cout << "create" << " " << sel_n << "\n";
+
+                            n = 0;
+                            for (int i = 0 ; _create.b[i] != '\0' ; i++)
+                                n = n * 10 + _create.b[i] - '0';
+
+                            sel_k = n;
                             return 200;
                         } 
 
@@ -382,6 +393,12 @@ int Hashtable::Select::checkPressOn(bool Press){
                             sel_v = n;
                             return 204;
                         }
+                        else if (v.kind == file && Loadfile == 1) {
+                            v.press = 0;
+                            KIND = 0;
+                            Loadfile = 0;
+                            return 205;
+                        }
                     }
                 }
             }
@@ -409,7 +426,7 @@ void Hashtable::Activity(){
     }
 
     if (g == 200) {
-        create(sel_n);
+        create(sel_n,sel_k);
     }
     else if (g == 201) {
         insert(sel_v);
@@ -418,17 +435,20 @@ void Hashtable::Activity(){
         search(sel_k);
     }
     else if (g == 203) {
-        Select(sel_k);
+        DElete(sel_k);
     }
     else if (g == 204){
       //  update(sel_i,sel_v);
+    }
+    else if (g == 205){
+        loadfile();
     }
 
     if (g >= 1 && g <= 5) {
         SelectPress(g - 1);
     }
 
-   // if (g != -1) std::cout << g << "\n";
+   // if (g != -1) // std::cout << g << "\n";
 }
 
 void Hashtable::SelectPress(int pos) {
@@ -438,24 +458,38 @@ void Hashtable::SelectPress(int pos) {
         if (i != pos) select.sel[i].press = 0;
 }
 
-void Hashtable::create(int n){
- //   avl = BinaryTreeAVL(Limitnode);
+void Hashtable::loadfile(){
     Animation.clear();
     AnimationEdge.clear();
+
+    std::ifstream fin;
+    fin.open(pathfile);
+    int n , k;
+    fin >> n >> k;
+    n = std::min(n,17);
+    hashtable = HashTable(n,10);
+
+    std::vector <Transforms2> f(hashtable.size);
+    std::vector <TransformsEdge> g(hashtable.size);
+
+    hashtable.dfs(200,1240,f,g);
+
     for (int i = 0 ; i < n ; i++) {
-        int x = rng() % 100;
-   //     avl.root = avl.Insert(avl.root,-1,0,x,Animation,AnimationEdge);
+        f[i].u.Af = 0;
     }
-
-  //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
-   // std::cout << "t43345 " << x << "\n";
-
-    std::vector <Transforms2> f(Limitnode);
-    std::vector <TransformsEdge> g(Limitnode);
-   // avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
 
     Animation.push_back(f);
     AnimationEdge.push_back(g);
+
+    for (int i = 0 ; i < k ; i++) {
+        int v = 100;
+        fin >> v;
+        std::cerr << v << "\n";
+        hashtable.insert(v,Animation,AnimationEdge);
+    }
+
+    fin.close();
+
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -464,14 +498,57 @@ void Hashtable::create(int n){
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
         UnreEdge.pop_back();
-        UnreAVL.pop_back();
+        UnreHash.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-   // UnreAVL.push_back(avl);
+    UnreHash.push_back(hashtable);
+}
+
+void Hashtable::create(int n,int k){
+
+    Animation.clear();
+    AnimationEdge.clear();
+    hashtable = HashTable(n,10);
+    std::vector <Transforms2> f(hashtable.size);
+    std::vector <TransformsEdge> g(hashtable.size);
+
+    hashtable.dfs(200,1240,f,g);
+
+    for (int i = 0 ; i < n ; i++) {
+        f[i].u.Af = 0;
+    }
+   // avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
+
+ //  // std::cout << n << " " << k << "\n";
+
+    Animation.push_back(f);
+    AnimationEdge.push_back(g);
+
+    for (int i = 0 ; i < k ; i++) {
+        int v = rng() % 100; 
+        hashtable.insert(v,Animation,AnimationEdge);
+    }
+
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        UnreEdge.pop_back();
+        UnreHash.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    UnreEdge.push_back(AnimationEdge);
+    UnreHash.push_back(hashtable);
 }
 
 
@@ -479,18 +556,15 @@ void Hashtable::insert(int v){
 
     Animation.clear();
     AnimationEdge.clear();
+    hashtable.insert(v,Animation,AnimationEdge);
 
-  //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
-   // std::cout << "t43345 " << x << "\n";
-
-  // avl.Insert(avl.root,-1,0,v,Animation,AnimationEdge);
-
-    std::vector <Transforms2> f(Limitnode);
-    std::vector <TransformsEdge> g(Limitnode);
-   // avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
-
-    Animation.push_back(f);
-    AnimationEdge.push_back(g);
+    if (Animation.empty()){
+        std::vector <Transforms2> f(hashtable.size);
+        std::vector <TransformsEdge> g(hashtable.size);
+        hashtable.dfs(200,1240,f,g);
+        Animation.push_back(f);
+        AnimationEdge.push_back(g);
+    }
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -499,22 +573,23 @@ void Hashtable::insert(int v){
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
         UnreEdge.pop_back();
-        UnreAVL.pop_back();
+        UnreHash.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
- //   UnreAVL.push_back(avl);
+    UnreHash.push_back(hashtable);
 }
 
 void Hashtable::search(int v){
     Animation.clear();
     AnimationEdge.clear();
 
+    hashtable.search(v,Animation,AnimationEdge);
   //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
-   // std::cout << "t43345 " << x << "\n";
+   // // std::cout << "t43345 " << x << "\n";
 
   //  avl.search(avl.root,-1,0,v,Animation,AnimationEdge);
     pause = 0;
@@ -525,24 +600,25 @@ void Hashtable::search(int v){
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
         UnreEdge.pop_back();
-        UnreAVL.pop_back();
+        UnreHash.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-  //  UnreAVL.push_back(avl);
+    UnreHash.push_back(hashtable);
 }
 
-void Hashtable::Select(int k){
-
-  //  if (k > avl.GetSize()) return ;
+void Hashtable::DElete(int v){
     Animation.clear();
     AnimationEdge.clear();
 
+    hashtable.Delete(v,Animation,AnimationEdge);
+  //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
+   // // std::cout << "t43345 " << x << "\n";
 
-   // avl.select(avl.root,-1,0,k,Animation,AnimationEdge);
+  //  avl.search(avl.root,-1,0,v,Animation,AnimationEdge);
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -551,14 +627,14 @@ void Hashtable::Select(int k){
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
         UnreEdge.pop_back();
-        UnreAVL.pop_back();
+        UnreHash.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-  //  UnreAVL.push_back(avl);
+    UnreHash.push_back(hashtable);
 }
 
 

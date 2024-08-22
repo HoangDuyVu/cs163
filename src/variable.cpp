@@ -12,6 +12,8 @@ int sel_v;
 int sel_k;
 int sel_i;
 int LimitNode;
+char pathfile[40];
+bool Loadfile;
 
 std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 Pos pos;
@@ -58,16 +60,14 @@ void button_select::DrawBasic(float g){
 
 void DrawVertex(Vector2 Postion,float radius,int val, int kind_color,unsigned char a) {
 
-    char text[4];
+    char text[7];
     snprintf(text, sizeof(text), "%d", val);
-    int fontSize = 5;
-    for (int i = 20 ; i <= 70 ; i++) {
+    int fontSize = 10;
+    for (int i = 11 ; i <= 70 ; i++) {
         Vector2 k = MeasureTextEx(customFont, text, i, 0);
         if (std::max(k.x,k.y) <= radius*7/5) fontSize = i;
         else break;
     }
-
- //   std::cout << fontSize << "\n";
 
     Vector2 textSize = MeasureTextEx(customFont, text, fontSize, 0);
 
@@ -111,3 +111,45 @@ void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned
     else if (kind_color == 1) DrawLineEx(PostionX,PostionY,6.0f,ConstColor2);
 }
 
+void DrawVertexRoot(Vector2 Postion,float radius,int val, int kind_color,unsigned char a) {
+
+  //  std::cout << kind_color << "\n";
+    char text[4];
+    snprintf(text, sizeof(text), "%d", val);
+    int fontSize = 20;
+    for (int i = 20 ; i <= 70 ; i++) {
+        Vector2 k = MeasureTextEx(customFont, text, i, 0);
+        if (std::max(k.x,k.y) <= radius*7/5) fontSize = i;
+        else break;
+    }
+
+    Rectangle rect = { Postion.x - radius, Postion.y - radius, radius*2, radius*2 }; // x, y, width, height
+    float roundness = 0.2f;
+    int segments = 4;
+
+ //   std::cout << fontSize << "\n";
+
+    Vector2 textSize = MeasureTextEx(customFont, text, fontSize, 0);
+
+    Vector2 textPosition = {
+        Postion.x - textSize.x / 2,
+        Postion.y - textSize.y / 2
+    };
+
+    if (kind_color == 0) {
+        DrawRectangleRounded(rect, roundness, segments, {107,100,184,a});
+        DrawTextEx(customFont, text, textPosition, fontSize, 0, WHITE);
+    }
+    else if (kind_color == 1){
+        DrawRectangleRounded(rect, roundness, segments, {107,100,184,255});
+        DrawRectangleRounded(rect, roundness, segments, {249, 150, 211,a});
+        DrawTextEx(customFont, text, textPosition, fontSize, 0, WHITE);
+    }
+    else if (kind_color == 2) {
+        DrawCircle(Postion.x,Postion.y, radius*6/5.0,{249, 150, 211,a});
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(WHITE,1.0*a/255.0));
+    }
+    else if (kind_color == 4){
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,{107,100,184,a});
+    }
+}

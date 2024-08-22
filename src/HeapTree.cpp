@@ -6,6 +6,7 @@
 #include <activities.hpp>
 #include <variable.hpp>
 #include <random>
+#include <fstream>
 
 void HeapTree::init(){
     heap = BinaryHeap(30);
@@ -237,7 +238,6 @@ void HeapTree::SolveRemote(){
 void HeapTree::draw(){
     SolveRemote();
     Vector2 Mouse = GetMousePosition();
-    select.draw();
     UpdatePostionNodePer();
     Notification();
    // DrawVertex(Vector2 {500,300},25,10,1,255);
@@ -301,6 +301,8 @@ void HeapTree::draw(){
     textBuffer[Iz + 1] = 'x';
     textBuffer[Iz + 2] = '\0';
     DrawTextEx(customFont,textBuffer,{1356,762},23,0,{220,249,243,255});
+
+    select.draw();
 }
 
 int HeapTree::Select::checkPressOn(bool Press){
@@ -372,6 +374,12 @@ int HeapTree::Select::checkPressOn(bool Press){
                             sel_v = n;
                             return 204;
                         }
+                        else if (v.kind == file && Loadfile == 1) {
+                            v.press = 0;
+                            KIND = 0;
+                            Loadfile = 0;
+                            return 205;
+                        }
                     }
                 }
             }
@@ -413,8 +421,12 @@ void HeapTree::Activity(){
     else if (g == 204){
         update(sel_i,sel_v);
     }
+    else if (g == 205) {
+        loadfile();
+        std::cout << pathfile << "\n";
+    }
 
-    if (g >= 1 && g <= 5) {
+    if (g >= 1 && g <= 6) {
         SelectPress(g - 1);
     }
 
@@ -424,8 +436,43 @@ void HeapTree::Activity(){
 void HeapTree::SelectPress(int pos) {
     select.sel[pos].press ^= 1;
     if (select.sel[pos].press)
-    for (int i = 0 ; i < 5 ; i++)
+    for (int i = 0 ; i < select.sel.size() ; i++)
         if (i != pos) select.sel[i].press = 0;
+}
+
+void HeapTree::loadfile(){
+    heap = BinaryHeap(30);
+    Animation.clear();
+    AnimationEdge.clear();
+    std::ifstream fin;
+    fin.open(pathfile);
+    int n;
+    fin >> n;
+    n = std::min(n,30);
+    for (int i = 1 ; i <= n ; i++) {
+        int x;
+        fin >> x;
+        heap.Insert(x,0,Animation,AnimationEdge);
+    }
+
+    fin.close();
+
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        UnreEdge.pop_back();
+        UnreHeap.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    UnreEdge.push_back(AnimationEdge);
+    UnreHeap.push_back(heap);
 }
 
 void HeapTree::create(int n){

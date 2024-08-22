@@ -561,6 +561,33 @@ private:
 
         };
 
+        struct FILE{
+            std::vector <button_select> Item;
+            void init(Vector2 _postion){
+                Item.resize(1);
+                Item[0] = button_select({362,204},{708.5,400},0,LoadTexture("res/textures/select/dropp.png"),WHITE);
+                Item[0].image.height /= 2;
+                Item[0].image.width /= 2;
+            }
+
+            void Draw(){
+
+                Vector2 x = GetMousePosition();
+                for (button_select v: Item){
+                    if (v.CheckMouse(x,1)) v.col = 1;
+                    else v.col = 0;
+                    v.DrawBasic(0.8f);
+                }
+
+                if (IsFileDropped()) {
+                    Loadfile = 1;
+                    FilePathList droppedFiles = LoadDroppedFiles();
+                    TextCopy(pathfile,droppedFiles.paths[0]);
+                    UnloadDroppedFiles(droppedFiles); 
+                }
+            }
+        };
+
 
         struct choose{
 
@@ -616,6 +643,7 @@ private:
         SEARCH _search;
         DELETE _delete;
         UPDATE _update;
+        FILE _file;
         std::vector <choose> sel;
         Texture2D Close;
         Texture2D Open;
@@ -630,19 +658,24 @@ private:
             _insert.init({184,576});
             _search.init({184,616});
             _delete.init({184,656});
+            _file.init({184,496});
            // _update.init({184,656});
             KIND = 1;
-            Postion = {0,536};
+            Postion = {0,496};
             Close = LoadTexture("res/textures/select/CloseNew.png");
             Open  = LoadTexture("res/textures/select/OpenNew.png");
+            Close.height /=4;
+            Close.width /=4;
+            Open.height /=4;
+            Open.width /=4;
             Textr = Close;
             Size = {(float)Close.width,(float)Close.height};
-            sel.resize(4);
+            sel.resize(5);
             sel[0] = choose(Create, Vector2 {27,536},Vector2 {150,40},"Create",ConstColor1,ConstColor2,0);
             sel[1] = choose(Insert, Vector2 {27,576},Vector2 {150,40},"Insert",ConstColor1,ConstColor2,0);
             sel[2] = choose(Search, Vector2 {27,616},Vector2 {150,40},"Search",ConstColor1,ConstColor2,0);
             sel[3] = choose(Delete, Vector2 {27,656},Vector2 {150,40},"Select",ConstColor1,ConstColor2,0);
-          //  sel[4] = choose(Update, Vector2 {27,656},Vector2 {150,40},"Update",ConstColor1,ConstColor2,0);
+            sel[4] = choose(file, Vector2 {27,496},Vector2 {150,40},"File",ConstColor1,ConstColor2,0);
         }
 
         bool CheckMouse(Vector2 A,int k){
@@ -671,6 +704,7 @@ private:
                         if (kind == Search) _search.Draw();
                         if (kind == Delete) _delete.Draw();
                         if (kind == Update) _update.Draw();
+                        if (kind == file)   _file.Draw();
                     }
                 }
             }
@@ -1220,6 +1254,7 @@ public:
     void insert(int v);
     void search(int v);
     void Select(int k);
+    void loadfile();
     void init();
     void draw();
     void UpdatePostionNodePer();

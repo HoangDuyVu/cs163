@@ -4,6 +4,7 @@
 #include <ViewInApp.hpp>
 #include <HeapTree.hpp>
 #include <AVLTree.hpp>
+#include <TTFTree.hpp>
 #include <Hashtable.hpp>
 #include <iostream>
 
@@ -12,6 +13,8 @@ ViewInApp viewapp;
 HeapTree heaptree;
 AVLTree avltree;
 Hashtable hashtable;
+TTFTree ttftree;
+
 
 
 void init(){
@@ -20,6 +23,7 @@ void init(){
     heaptree.init();
     avltree.init();
     hashtable.init();
+    ttftree.init();
 }
 
 void Activities() {
@@ -40,6 +44,11 @@ void Activities() {
             pos = HASHTABLE;
             hashtable.init();
         }
+
+        if (x == 2) {
+            pos = TTFTREE;
+            ttftree.init();
+        }
     }
 
     if (pos == HEAPTREE) {
@@ -52,6 +61,10 @@ void Activities() {
     
     if (pos == HASHTABLE) {
         hashtable.Activity();
+    }
+
+    if (pos == TTFTREE) {
+        ttftree.Activity();
     }
 }
 
@@ -71,5 +84,9 @@ void draw() {
     else if (pos == HASHTABLE) {
         viewapp.draw();
         hashtable.draw();
+    }
+    else if (pos == TTFTREE) {
+        viewapp.draw();
+        ttftree.draw();
     }
 }

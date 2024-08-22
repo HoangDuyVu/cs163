@@ -684,12 +684,13 @@ private:
         int Af;
         int color;
         int key;
+        int pos;
         bool root;
         Vertex2() {
             root = 0;
         }
 
-        Vertex2(Vector2 Postion,float radius, int color,int val,bool death,int height,int left,int right):
+        Vertex2(Vector2 Postion,float radius, int color,int val):
         Postion(Postion),
         radius(radius),
         color(color),
@@ -703,21 +704,44 @@ private:
     };
 
     class HashTable {
+
+    public:
         int SizeN;
         int SizeM;
+        int size;
         std::vector <std::vector<Vertex2> > arr;
 
         HashTable(int n = 0,int m = 0) {
             SizeN = n;
             SizeM = m;
+            size = n;
             arr.resize(n);
+            for (int i = 0 ; i < n ; i++){
+                arr[i].push_back(Vertex2({0,0},17,0,0));
+                arr[i][0].root = 1;
+            }
+        }
+
+        void dfs(int l,int r, std::vector <Transforms2> Anima,std::vector <TransformsEdge> AnimaE) {
+            float delta = 80;
+            int left = ((l + r) / 2.0) - 1.0*delta*(SizeN - 1)/2.0;
+            int d = SizeN;
+
+            for (int i = 0 ; i < SizeN ; i++) {
+                int postionx = left + i*delta;
+                int postiony = 130;
+                
+            }
         }
 
         void insert(int k,std::vector<std::vector<Transforms2> > &AnimationI,std::vector<std::vector <TransformsEdge> > &AnimationE) {
-            int k = k % SizeN;
+            k = k % SizeN;
             if (arr[k].size() == SizeM) return ;
 
-
+            std::vector <Transforms2> Anima(size);
+            std::vector <TransformsEdge> AnimaE(size);
+            
+            dfs(200,1240,Anima,AnimaE);
         }
 
 
@@ -731,8 +755,8 @@ private:
     std::vector <std::vector<TransformsEdge> > AnimationEdge;
     std::vector <std::vector <std::vector<TransformsEdge> > > UnreEdge; 
     std::vector<button_select> remote;
-    std::vector <BinaryTreeAVL> UnreAVL;
-    BinaryTreeAVL avl;
+    std::vector <HashTable> UnreAVL;
+    HashTable hashtable;
     Select select;
     double LastTime,NewTime,TotalTime;
     int pos_ani;

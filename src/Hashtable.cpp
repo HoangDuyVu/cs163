@@ -9,7 +9,7 @@
 
 
 void Hashtable::init(){
-    avl = BinaryTreeAVL(Limitnode);
+    hashtable = HashTable(10,5);
     Animation.clear();
     AnimationEdge.clear();
     Unre.clear();
@@ -68,7 +68,6 @@ float Hashtable::NewPos1D(float x, float y, float g) {
 
 void Hashtable::DrawAnimation(std::vector<Transforms2> f,double g){
     for (Transforms2 v : f) {
-        if (!v.v.Notdeath) continue;
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         NewA = std::max(NewA,0);
@@ -77,63 +76,14 @@ void Hashtable::DrawAnimation(std::vector<Transforms2> f,double g){
             DrawVertex(NewPostion,v.u.radius,v.u.key,v.u.color,255);
         }
         
-        if (!v.v.drawf)    DrawVertex(NewPostion,v.u.radius,v.v.key,v.v.color,NewA);
-        else  DrawVertex(NewPostion,v.u.radius,v.v.key,v.v.color,255);
-
-        if (v.v.drawbalance) {
-            float NewRadius = 1.75*v.u.radius;
-            char text[6];
-            text[0] = 'b';
-            text[1] = 'f';
-            text[2] = '=';
-            if (v.v.balance >= 0) {
-                text[3] = abs(v.v.balance) + '0';
-                text[4] = '\0';
-            }
-            else {
-                text[3] = '-';
-                text[4] = abs(v.v.balance) + '0';
-                text[5] = '\0';  
-            }
-            DrawVertexText({NewPostion.x,NewPostion.y + NewRadius},NewRadius,text,17,NewA);
-        }
-
-        if (v.v.drawf) {
-            float NewRadius = 1.75*v.u.radius;
-            int n =v.v.f;
-            char text[8];
-            text[0] = 'S';
-            text[1] = 'i';
-            text[2] = 'z';
-            text[3] = 'e';
-            text[4] = '=';
-            text[5] = n / 10 + '0';
-            text[6] = n % 10 + '0';
-            text[7] = '\0';
-            DrawVertexText({NewPostion.x,NewPostion.y + NewRadius},NewRadius,text,15,NewA);
-        }
-
-        if (v.v.drawrank) {
-            float NewRadius = 1.75*v.u.radius;
-            int n =v.v.rank;
-            char text[8];
-            text[0] = 'R';
-            text[1] = 'a';
-            text[2] = 'n';
-            text[3] = 'k';
-            text[4] = '=';
-            text[5] = n / 10 + '0';
-            text[6] = n % 10 + '0';
-            text[7] = '\0';
-            DrawVertexText({NewPostion.x,NewPostion.y + NewRadius},NewRadius,text,15,NewA);   
-        }
+       DrawVertex(NewPostion,v.u.radius,v.v.key,v.v.color,NewA);
     }
 }
 
 void Hashtable::DrawAnimationEdge(std::vector<TransformsEdge> f,double g){
     int d = 0;
     for (TransformsEdge v : f) {
-        if (!Animation[pos_ani][d].v.Notdeath) continue;
+    //    if (!Animation[pos_ani][d].v.Notdeath) continue;
         d++;
         Vector2 NewPostionX = NewPos2D(v.u.PostionX,v.v.PostionX,g);
         Vector2 NewPostionY = NewPos2D(v.u.PostionY,v.v.PostionY,g);
@@ -256,7 +206,7 @@ void Hashtable::SolveRemote(){
                 else {
                     Animation = Unre[Pos_unre];
                     AnimationEdge = UnreEdge[Pos_unre];
-                    avl = UnreAVL[Pos_unre];
+            //        avl = UnreAVL[Pos_unre];
                     pause = 1;
                     pos_ani = Animation.size() - 1;
                     TotalTime = deltaTime;
@@ -269,7 +219,7 @@ void Hashtable::SolveRemote(){
                 Pos_unre++;
                 Animation = Unre[Pos_unre];
                 AnimationEdge = UnreEdge[Pos_unre];
-                avl = UnreAVL[Pos_unre];
+       //         avl = UnreAVL[Pos_unre];
                 pause = 1;
                 pos_ani = Animation.size() - 1;
                 TotalTime = deltaTime - deltaTime/10;
@@ -440,7 +390,7 @@ int Hashtable::Select::checkPressOn(bool Press){
 
 void Hashtable::Activity(){
 
-    LimitNode = avl.GetSize();
+   // LimitNode = avl.GetSize();
     int g = UpdatePressOn();
     if (g == 101 || g == 102) {
         pos = MENU;
@@ -489,12 +439,12 @@ void Hashtable::SelectPress(int pos) {
 }
 
 void Hashtable::create(int n){
-    avl = BinaryTreeAVL(Limitnode);
+ //   avl = BinaryTreeAVL(Limitnode);
     Animation.clear();
     AnimationEdge.clear();
     for (int i = 0 ; i < n ; i++) {
         int x = rng() % 100;
-        avl.root = avl.Insert(avl.root,-1,0,x,Animation,AnimationEdge);
+   //     avl.root = avl.Insert(avl.root,-1,0,x,Animation,AnimationEdge);
     }
 
   //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
@@ -502,7 +452,7 @@ void Hashtable::create(int n){
 
     std::vector <Transforms2> f(Limitnode);
     std::vector <TransformsEdge> g(Limitnode);
-    avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
+   // avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
 
     Animation.push_back(f);
     AnimationEdge.push_back(g);
@@ -521,28 +471,23 @@ void Hashtable::create(int n){
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-    UnreAVL.push_back(avl);
+   // UnreAVL.push_back(avl);
 }
 
 
 void Hashtable::insert(int v){
 
-    if (avl.find() == -1) {
-        CheckNotification = 1;
-        TimeNotification = 0.0f;
-        return ;
-    }
     Animation.clear();
     AnimationEdge.clear();
 
   //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
    // std::cout << "t43345 " << x << "\n";
 
-   avl.Insert(avl.root,-1,0,v,Animation,AnimationEdge);
+  // avl.Insert(avl.root,-1,0,v,Animation,AnimationEdge);
 
     std::vector <Transforms2> f(Limitnode);
     std::vector <TransformsEdge> g(Limitnode);
-    avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
+   // avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
 
     Animation.push_back(f);
     AnimationEdge.push_back(g);
@@ -561,7 +506,7 @@ void Hashtable::insert(int v){
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-    UnreAVL.push_back(avl);
+ //   UnreAVL.push_back(avl);
 }
 
 void Hashtable::search(int v){
@@ -571,7 +516,7 @@ void Hashtable::search(int v){
   //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
    // std::cout << "t43345 " << x << "\n";
 
-    avl.search(avl.root,-1,0,v,Animation,AnimationEdge);
+  //  avl.search(avl.root,-1,0,v,Animation,AnimationEdge);
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -587,17 +532,17 @@ void Hashtable::search(int v){
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-    UnreAVL.push_back(avl);
+  //  UnreAVL.push_back(avl);
 }
 
 void Hashtable::Select(int k){
 
-    if (k > avl.GetSize()) return ;
+  //  if (k > avl.GetSize()) return ;
     Animation.clear();
     AnimationEdge.clear();
 
 
-    avl.select(avl.root,-1,0,k,Animation,AnimationEdge);
+   // avl.select(avl.root,-1,0,k,Animation,AnimationEdge);
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -613,7 +558,7 @@ void Hashtable::Select(int k){
 
     Unre.push_back(Animation);
     UnreEdge.push_back(AnimationEdge);
-    UnreAVL.push_back(avl);
+  //  UnreAVL.push_back(avl);
 }
 
 

@@ -49,7 +49,7 @@ private:
                 }
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-                    int n = rng() % (Limitnode + 1);
+                    int n = rng() % (Limitnode + 30 + 1);
                     if (n == -1) n = 0;
 
                     a[0] = n / 10 + '0';
@@ -72,9 +72,9 @@ private:
 
                     int n = 0;
                     for (int i = 0 ; i < strlen(a); i++) n = n*10 + a[i] - '0';
-                    if (n > Limitnode) {
+                    if (n > Limitnode + 30) {
                     if (n == -1) n = 0;
-                        n = Limitnode;
+                        n = Limitnode + 30;
                         a[0] = n / 10 + '0';
                         a[1] = n % 10 + '0';
                         a[2] = '\0';
@@ -727,7 +727,7 @@ private:
         int posVal;
         key(int _val = 0) {
             val = _val;
-            color = 1;
+            color = 0;
             colorE = 1;
             par = -1;
             Af = 255;
@@ -740,7 +740,9 @@ private:
         float radius; 
         bool NotDeath;
         int leaf;
+        int poss = 0;
         Vertex2 *par;
+        float midx;
         
         key keys[3];
         Vertex2* childs[4]; 
@@ -867,8 +869,8 @@ private:
         int CountKey(Vertex2 *u) {
             if (u == nullptr) return 0;
             int d = u->numKeys;
-            for (Vertex2 *v : u->childs) 
-                d += CountKey(v);
+            for (int i = 0 ; i <= u->numKeys ; i++) 
+                d += CountKey(u->childs[i]);
             return d;
         }
 
@@ -905,79 +907,143 @@ private:
         float FindPostion(Vertex2* u,float t,float f,float h,float delh,float r) {
             if (u == nullptr) return 0;
 
-           // std::cout << u->keys[0].val << '\n';
-          //  if (u-> par != nullptr) std::cout << u->keys[0].val << " " << u->par->keys[0].val << "\n";
+            std::cout << h << "\n";
+
             float g = t;
-            std::vector <float> k;
-            for (Vertex2 *v : u->childs) {
-                if (k.empty() && v->keys.front().par == u->childs.size()) g += r + f;
-                g = FindPostion(v,g,f,h + delh,delh,r);
-                k.push_back(g);
+            float mid = -1;
+            int dd = 0;
+            for (int i = 0 ; i < u->numKeys ; i++) {
+                Vertex2 *v = u->childs[i];
+                if (v != nullptr) dd++;
+                g = FindPostion(v,g,f,h+ delh,delh,r);
             }
 
-           float mid = (std::max(g  - f - 2*r,t) + t) / 2.0;
-
-            if (!u->childs.empty() && u->childs.front()->keys.front().par == 0) {
-                mid = std::max(mid,k[0] - r - f );
+            if (g == t) {
+                mid = g;
+                g += f + r;
             }
 
-            std::cout << u->keys[0].val << "----- " << mid << " " << g << " " << t << ": "; 
-            
-            float m = u->keys.size() / 2.0;
+            Vertex2 *v = u->childs[u->numKeys];
+            if (v != nullptr) dd++;
+            g = FindPostion(v,g,f,h + delh,delh,r);
 
-            float left = mid - 1.0*(r*2 + 4)*((int)u->keys.size() - 1)/2.0;
+            if (dd == 1 && u->childs[0] != nullptr) {
+                g += f + r;
+                mid = g;
+            }
+
+            if (mid == -1)  mid = (std::max(g  - f - 2*r,t) + t) / 2.0;
+
+            float m = u->numKeys / 2.0;
+            float left = mid - 1.0*(r*2 + 4)*((int)u->numKeys - 1)/2.0;
+
             if (left < t) left = t;
-            for (int i  = 0 ; i < u->keys.size() ; i++) {
+            for (int i  = 0 ; i < u->numKeys ; i++) {
                 u->keys[i].Postion = {left,h};
                 u->keys[i].radius = r;
-                std::cout << u->keys[i].Postion.x << " ";
+               // std::cout << u->keys[i].val << " " << u->keys->Postion.x << " " << u->keys->Postion.y << " " << u->keys->pos << "\n";
                 left += (r*2 + 4);
-            } 
-
-            std::cout << left << "\n";
+            }
 
             return std::max(g,left + f - 4);
+
+        //    // std::cout << u->keys[0].val << '\n';
+        //   //  if (u-> par != nullptr) std::cout << u->keys[0].val << " " << u->par->keys[0].val << "\n";
+        //     float g = t;
+        //     std::vector <float> k;
+        //     for (Vertex2 *v : u->childs) {
+        //         if (k.empty() && v->keys.front().par == u->childs.size()) g += r + f;
+        //         g = FindPostion(v,g,f,h + delh,delh,r);
+        //         k.push_back(g);
+        //     }
+
+        //    float mid = (std::max(g  - f - 2*r,t) + t) / 2.0;
+
+        //     if (!u->childs.empty() && u->childs.front()->keys.front().par == 0) {
+        //         mid = std::max(mid,k[0] - r - f );
+        //     }
+
+        //     std::cout << u->keys[0].val << "----- " << mid << " " << g << " " << t << ": "; 
+            
+        //     float m = u->keys.size() / 2.0;
+
+        //     float left = mid - 1.0*(r*2 + 4)*((int)u->keys.size() - 1)/2.0;
+        //     if (left < t) left = t;
+        //     for (int i  = 0 ; i < u->keys.size() ; i++) {
+        //         u->keys[i].Postion = {left,h};
+        //         u->keys[i].radius = r;
+        //         std::cout << u->keys[i].Postion.x << " ";
+        //         left += (r*2 + 4);
+        //     } 
+
+        //     std::cout << left << "\n";
+
+        //     return std::max(g,left + f - 4);
         }
 
-        // void PostionEdge(Vertex2 * u) {
-        //     if (u == nullptr) return ;
+        void PostionEdge(Vertex2 * u) {
+            if (u == nullptr) return ;
 
-        //     for (Vertex2 * &v : u->childs) {
-        //         float mid = (u->keys[0].Postion.x + u->keys.back().Postion.x) / 2.0;
-        //         float mid2 = (v->keys[0].Postion.x + v->keys.back().Postion.x) / 2.0;
-        //         key &x = v->keys.front();
+            int k = u->numKeys;
+            int poss = -1;
+            for (int i = 0; i < k ; i++) if (u->keys[i].par != -1) poss = i;
 
-        //         std::cout << x.val << " " << mid << " " << mid2 << "\n";
-        //         if (x.par == 0) {
-        //             x.PostionE = {mid2,x.Postion.y};
-        //             x.PostionPar = {u->keys.front().Postion};
-        //         }
-        //         else if (x.par == u->keys.size()) {
-        //             x.PostionE = {mid2,x.Postion.y};
-        //             x.PostionPar = {u->keys.back().Postion};
-        //         }
-        //         else {
-        //             x.PostionE = {mid2,x.Postion.y};
-        //             x.PostionPar = {mid,u->keys.back().Postion.y};
-        //         }
+            if (poss == -1) poss = 0;
+            u->poss = poss;
+            for (int i = 0 ; i <= k ; i++) PostionEdge(u->childs[i]);
+            int d = 0;
+            u->midx = (u->keys[0].Postion.x + u->keys[u->numKeys - 1].Postion.x) / 2.0;
 
-        //         PostionEdge(v);
-        //     }
-        // }
+            for (int d = 0 ; d <= k ; d++){
+                if (u->childs[d] != nullptr && d != 0 && d != k){
+                    int Pl = u->childs[d]->poss;
+                    key &x = u->childs[d]->keys[Pl];
+                    x.par = 0;
+                    x.PostionE = {u->childs[d]->midx,x.Postion.y};
+                    x.PostionPar = {u->midx,u->keys[Pl].Postion.y};
+                }
+                else if (u->childs[d] != nullptr && d == 0){
+                    int Pl = u->childs[d]->poss;
+                    key &x = u->childs[d]->keys[Pl];
+                    x.par = 0;
+                    x.PostionE = {u->childs[d]->midx,x.Postion.y};
+                    x.PostionPar = u->keys[Pl].Postion;
+                }
+                else if (u->childs[d] != nullptr && d == k){
+                    int Pl = u->childs[d]->poss;
+                    key &x = u->childs[d]->keys[Pl];
+                    x.par = 0;
+                    x.PostionE = {u->childs[d]->midx,x.Postion.y};
+                    x.PostionPar = {u->midx,u->keys[k - 1].Postion.y};
+                }
+            }
+            
+        }
 
         void SetPostion() {
             Formard(root);
-            float k = screenWidth - (FindPostion(root,0,40,100,70,21.4) - 40 - 2*21.4);
-            FindPostion(root,k/2.0,40,100,70,21.4);
+            float r = 21.4;
+            float dis = 40;
+            float k = 0;
+            for (int i = r ; i >= 10 ; i--) {
+                dis -= 2;
+                r-= 1;
+                k = screenWidth - (FindPostion(root,0,dis,150,100,r) - dis - 2*r);
+                if (k > 30) break;
+            }
+            FindPostion(root,k/2.0,dis,150,100,r);
             PostionEdge(root);
         }
 
         void GetUI(Vertex2* u,std::vector<Transforms2> &Anima){
             if (u == nullptr) return ;
-            for (key v : u->keys)
+            int d = u->numKeys;
+            for (int i = 0 ; i < d ; i++) {
+                key v = u->keys[i];
                 Anima[v.pos].u = Anima[v.pos].v = v;
-            for (Vertex2 *v : u->childs) {
-                GetUI(v,Anima);
+            }
+            for (int i = 0 ; i <= d ; i++) {
+                GetUI(u->childs[i],Anima);
             }
         }
 

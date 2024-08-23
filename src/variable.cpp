@@ -11,6 +11,7 @@ int sel_n;
 int sel_v;
 int sel_k;
 int sel_i;
+Texture2D L1,L2,L3;
 int LimitNode;
 char pathfile[40];
 bool Loadfile;
@@ -23,6 +24,9 @@ Font customFont;
 double deltaTime = 1.0f;
 
 void init_bg(){ 
+    L1 = LoadTexture("res/textures/node/node1.png");
+    L2 = LoadTexture("res/textures/node/node2.png");
+    L3 = LoadTexture("res/textures/node/node3.png");
     Logo = LoadTexture("res/textures/bg/name.png");
     customFont = LoadFontEx("res/fonts/Roboto/Roboto-Bold.ttf",100,nullptr,0); // Path to your custom font file
 
@@ -153,3 +157,48 @@ void DrawVertexRoot(Vector2 Postion,float radius,int val, int kind_color,unsigne
         DrawTextEx(customFont, text, textPosition, fontSize, 0,{107,100,184,a});
     }
 }
+
+void DrawVertexL(Vector2 Postion,float radius,int val, int kind_color,unsigned char a) {
+
+    char text[7];
+    snprintf(text, sizeof(text), "%d", val);
+    int fontSize = 10;
+    for (int i = 11 ; i <= 70 ; i++) {
+        Vector2 k = MeasureTextEx(customFont, text, i, 0);
+        if (std::max(k.x,k.y) <= radius*7/5) fontSize = i;
+        else break;
+    }
+
+    Vector2 textSize = MeasureTextEx(customFont, text, fontSize, 0);
+
+    Vector2 textPosition = {
+        Postion.x - textSize.x / 2,
+        Postion.y - textSize.y / 2
+    };
+
+    Texture2D PH;
+    if (kind_color == 0) PH = L1;
+    if (kind_color == 1) PH = L2;
+    if (kind_color == 3) PH = L3;
+
+    double g = PH.height;
+    PH.height *= (radius*2)/PH.height;
+    PH.width *= (radius*2)/g;
+
+    if (kind_color == 0) {
+        DrawTexture(PH,Postion.x - radius,Postion.y - radius,Fade(WHITE,a));
+        DrawTextEx(customFont, text, textPosition, fontSize, 0, {107,100,184,a});
+    }
+    else if (kind_color == 1){
+        DrawTexture(PH,Postion.x - radius,Postion.y - radius,Fade(WHITE,a));
+        DrawTextEx(customFont, text, textPosition, fontSize, 0, {249, 150, 211,a});
+    }
+    else if (kind_color == 2) {
+        DrawTexture(PH,Postion.x - radius,Postion.y - radius,Fade(WHITE,a));
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(WHITE,1.0*a/255.0));
+    }
+    else if (kind_color == 4){
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,{107,100,184,a});
+    }
+}
+

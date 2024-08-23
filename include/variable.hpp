@@ -48,6 +48,7 @@ enum Kind{
 };
 
 extern Pos pos;
+extern Texture2D L1,L2,L3;
 void init_bg();
 void draw_bg();
 
@@ -169,6 +170,7 @@ void DrawVertex(Vector2 Postion,float radius,int val, int kind_color,unsigned ch
 void DrawVertexText(Vector2 Postion,float radius,char *text, int fontSize,unsigned char a);
 void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a);
 void DrawVertexRoot(Vector2 Postion,float radius,int val, int kind_color,unsigned char a);
+void DrawVertexL(Vector2 Postion,float radius,int val, int kind_color,unsigned char a);
 
 
 

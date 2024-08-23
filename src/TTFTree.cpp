@@ -70,18 +70,19 @@ float TTFTree::NewPos1D(float x, float y, float g) {
 void TTFTree::DrawAnimation(std::vector<Transforms2> f,double g){
     for (Transforms2 v : f) {
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
+        Vector2 NewPostionE = NewPos2D(v.u.PostionE,v.v.PostionE,g);
+        Vector2 NewPostionPar = NewPos2D(v.u.PostionPar,v.v.PostionPar,g);
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         NewA = std::max(NewA,0);
-        if (v.v.par != -1) DrawEdge(v.v.PostionPar,v.v.PostionE,0,0,255);
-       // DrawVertex(NewPostion,v.v.radius,v.v.val,v.v.color,NewA);
+        if (v.v.par != -1) DrawEdge(NewPostionE,NewPostionPar,0,0,NewA);
     }
 
     for (Transforms2 v : f) {
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
+        double Newr = NewPos1D(v.u.radius,v.v.radius,g);
         NewA = std::max(NewA,0);
-      //  if (v.v.par != -1) DrawEdge(v.v.PostionPar,v.v.Postion,0,0,255);
-        DrawVertex(NewPostion,v.v.radius,v.v.val,v.v.color,NewA);
+        DrawVertex(NewPostion,Newr,v.v.val,v.v.color,NewA);
     }
 
 }
@@ -471,10 +472,9 @@ void TTFTree::loadfile() {
 }
 
 void TTFTree::create(int n){
-    // avl = TwoTFTree(Limitnode);
+    tft = TwoTFTree(LimitNode + 30);
     Animation.clear();
-    // // AnimationEdge.clear();
-    for (int i = 0 ; i < 4 ; i++) {
+    for (int i = 0 ; i < n ; i++) {
         int x = rng() % 100;
         tft.insert(x);
     }
@@ -507,14 +507,20 @@ void TTFTree::create(int n){
 void TTFTree::insert(int v){
 
     Animation.clear();
-    tft.insert(v);
-
-
     std::vector<Transforms2> Anima(tft.Pos.size());
     tft.SetPostion();
     tft.GetUI(tft.root,Anima);
-
     Animation.push_back(Anima);
+    tft.insert(v);
+
+    std::vector<Transforms2> Anima2(tft.Pos.size());
+    tft.SetPostion();
+    tft.GetUI(tft.root,Anima2);
+
+    for (int i = 0 ; i < Anima.size() ; i++)
+    Anima2[i].u = Anima[i].v;
+
+    Animation.push_back(Anima2);
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();

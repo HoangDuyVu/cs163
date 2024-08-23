@@ -115,6 +115,11 @@ void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned
     else if (kind_color == 1) DrawLineEx(PostionX,PostionY,6.0f,ConstColor2);
 }
 
+void DrawEdge2(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a) {
+    if (kind_color == 0) DrawLineEx(PostionX,PostionY,6.0f,{107,100,184,a});
+    else if (kind_color == 1) DrawLineEx(PostionX,PostionY,7.0f,{255, 143, 183,a});
+}
+
 void DrawVertexRoot(Vector2 Postion,float radius,int val, int kind_color,unsigned char a) {
 
   //  std::cout << kind_color << "\n";
@@ -179,22 +184,22 @@ void DrawVertexL(Vector2 Postion,float radius,int val, int kind_color,unsigned c
     Texture2D PH;
     if (kind_color == 0) PH = L1;
     if (kind_color == 1) PH = L2;
-    if (kind_color == 3) PH = L3;
+    if (kind_color == 2) PH = L3;
 
     double g = PH.height;
-    PH.height *= (radius*2)/PH.height;
-    PH.width *= (radius*2)/g;
+    PH.height *= (radius*2 + 14 - (10*(21.4-radius)/21.4))/PH.height;
+    PH.width *= (radius*2 + 14 -  (10*(21.4-radius)/21.4))/g;
 
     if (kind_color == 0) {
-        DrawTexture(PH,Postion.x - radius,Postion.y - radius,Fade(WHITE,a));
+        DrawTexture(PH,Postion.x - PH.width/2.0,Postion.y - PH.height/2.0,Fade(WHITE,1.0*a/255.0));
         DrawTextEx(customFont, text, textPosition, fontSize, 0, {107,100,184,a});
     }
     else if (kind_color == 1){
-        DrawTexture(PH,Postion.x - radius,Postion.y - radius,Fade(WHITE,a));
-        DrawTextEx(customFont, text, textPosition, fontSize, 0, {249, 150, 211,a});
+        DrawTexture(PH,Postion.x - PH.width/2.0,Postion.y - PH.height/2.0,Fade(WHITE,1.0*a/255.0));
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,{255, 143, 183,a});
     }
-    else if (kind_color == 2) {
-        DrawTexture(PH,Postion.x - radius,Postion.y - radius,Fade(WHITE,a));
+    else if (kind_color < 4) {
+        DrawTexture(PH,Postion.x - PH.width/2.0,Postion.y - PH.height/2.0,Fade(WHITE,1.0*a/255.0));
         DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(WHITE,1.0*a/255.0));
     }
     else if (kind_color == 4){

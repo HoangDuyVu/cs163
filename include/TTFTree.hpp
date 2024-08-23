@@ -728,11 +728,17 @@ private:
         key(int _val = 0) {
             val = _val;
             color = 0;
-            colorE = 1;
+            colorE = 0;
             par = -1;
             Af = 255;
             AE = 255;
         }
+    };
+
+    struct Transforms2{
+        key u,v;
+        Transforms2() {}
+        Transforms2(key u,key v): u(u), v(v) {}
     };
 
     struct Vertex2 {
@@ -741,7 +747,6 @@ private:
         bool NotDeath;
         int leaf;
         int poss = 0;
-        Vertex2 *par;
         float midx;
         
         key keys[3];
@@ -760,85 +765,6 @@ private:
         radius(radius),
         NotDeath(NotDeath)
         {}
-
-        void insertNonFull(int k,key g) {
-            int i = numKeys - 1;
-
-            // Nếu là nút lá
-            if (leaf) {
-                // Dịch chuyển các phần tử lớn hơn để tìm vị trí chèn
-                while (i >= 0 && keys[i].val > k) {
-                    keys[i + 1] = keys[i];
-                    childs[i + 1] = childs[i];
-                    i--;
-                }
-
-                // Chèn phần tử vào vị trí tìm được
-                keys[i + 1] = g;
-
-                childs[i + 1] = nullptr;
-                numKeys++;
-            } else { // Nếu không phải nút lá
-                // Tìm con phù hợp để di chuyển xuống
-                while (i >= 0 && keys[i].val > k) {
-                    i--;
-                }
-
-                // Kiểm tra xem con đã đầy hay chưa
-                if (childs[i + 1]->numKeys == 3) {
-                    // Tách con nếu nó đầy
-                    splitChild(i + 1, childs[i + 1]);
-
-                    // Sau khi tách, phần tử ở giữa di chuyển lên, cần kiểm tra lại
-                    if (keys[i + 1].val < k) {
-                        i++;
-                    }
-                }
-                childs[i + 1]->insertNonFull(k,g);
-            }
-        }
-
-    void splitChild(int i, Vertex2* y) {
-            // Tạo một nút mới để chứa các phần tử lớn hơn của y
-            Vertex2* z = new Vertex2(y->leaf);
-            z->numKeys = 1;
-
-            // Chuyển phần tử cuối cùng của y sang z
-            z->keys[0] = y->keys[2];
-
-            // Nếu y không phải là nút lá, chuyển các con của y sang z
-            if (!y->leaf) {
-                for (int j = 0; j < 2; j++) {
-                    z->childs[j] = y->childs[j + 2];
-                    y->childs[j + 2] = nullptr;
-                }
-            }
-
-            y->numKeys = 1; // Giảm số lượng phần tử của y
-
-            // Dịch chuyển các con của nút hiện tại để tạo chỗ cho z
-            for (int j = numKeys; j >= i + 1; j--) {
-                childs[j + 1] = childs[j];
-            }
-
-            // Liên kết z với nút hiện tại
-            childs[i + 1] = z;
-
-            // Dịch chuyển các phần tử của nút hiện tại để tạo chỗ cho phần tử giữa của y
-            for (int j = numKeys - 1; j >= i; j--) {
-                keys[j + 1] = keys[j];
-            }
-
-            // Đưa phần tử giữa của y lên nút hiện tại
-            keys[i] = y->keys[1];
-            numKeys++;
-        }
-    };
-
-    struct Transforms2{
-        key u,v;
-        Transforms2() {}
-        Transforms2(key u,key v): u(u), v(v) {}
     };
 
     class TwoTFTree{
@@ -864,8 +790,6 @@ private:
             }
         }
 
-
-
         int CountKey(Vertex2 *u) {
             if (u == nullptr) return 0;
             int d = u->numKeys;
@@ -874,40 +798,19 @@ private:
             return d;
         }
 
-        void Formard(Vertex2 *u) {
-            // if (u == nullptr) return;
-            // int d = u->keys.size();
-            // std::sort(u->keys.begin(),u->keys.end(),[](key a, key b){
-            //     return a.val < b.val;
-            // });
-
-            // for (key &v : u->keys) v.par = -1;
-
-            // std::sort(u->childs.begin(),u->childs.end(),[](Vertex2 *a, Vertex2 *b){
-            //     return a->keys[0].val < b->keys[0].val;
-            // });
-
-            // if (!u->childs.empty()) u->leaf = 0;
-
-            // auto p = u->keys.begin();
-            // int dd = 0;
-            // for (Vertex2 *&v : u->childs)  {  
-            //     Formard(v);
-            //     if (p != u->keys.end() && p->val < v->keys[0].val){
-            //         p++;
-            //         dd++;
-            //     }
-
-            //     v->keys.front().par = dd;
-            //     v-> par = u;
-            // }
-            // return;
+        Vertex2 *Save(Vertex2* u) {
+            if (u == nullptr) return u;
+            Vertex2* p = new Vertex2();
+            p->leaf = u->leaf;
+            p->numKeys = u->numKeys;
+            for (int i = 0 ; i < 3; i++) p->keys[i] = u->keys[i];
+            for (int i = 0 ; i < 4; i++) p->childs[i] = u->childs[i];
+            for (int i = 0 ; i < 4 ; i++) p->childs[i] = Save(p->childs[i]);
+            return p;
         }
 
         float FindPostion(Vertex2* u,float t,float f,float h,float delh,float r) {
             if (u == nullptr) return 0;
-
-            std::cout << h << "\n";
 
             float g = t;
             float mid = -1;
@@ -946,39 +849,6 @@ private:
             }
 
             return std::max(g,left + f - 4);
-
-        //    // std::cout << u->keys[0].val << '\n';
-        //   //  if (u-> par != nullptr) std::cout << u->keys[0].val << " " << u->par->keys[0].val << "\n";
-        //     float g = t;
-        //     std::vector <float> k;
-        //     for (Vertex2 *v : u->childs) {
-        //         if (k.empty() && v->keys.front().par == u->childs.size()) g += r + f;
-        //         g = FindPostion(v,g,f,h + delh,delh,r);
-        //         k.push_back(g);
-        //     }
-
-        //    float mid = (std::max(g  - f - 2*r,t) + t) / 2.0;
-
-        //     if (!u->childs.empty() && u->childs.front()->keys.front().par == 0) {
-        //         mid = std::max(mid,k[0] - r - f );
-        //     }
-
-        //     std::cout << u->keys[0].val << "----- " << mid << " " << g << " " << t << ": "; 
-            
-        //     float m = u->keys.size() / 2.0;
-
-        //     float left = mid - 1.0*(r*2 + 4)*((int)u->keys.size() - 1)/2.0;
-        //     if (left < t) left = t;
-        //     for (int i  = 0 ; i < u->keys.size() ; i++) {
-        //         u->keys[i].Postion = {left,h};
-        //         u->keys[i].radius = r;
-        //         std::cout << u->keys[i].Postion.x << " ";
-        //         left += (r*2 + 4);
-        //     } 
-
-        //     std::cout << left << "\n";
-
-        //     return std::max(g,left + f - 4);
         }
 
         void PostionEdge(Vertex2 * u) {
@@ -1000,34 +870,33 @@ private:
                     key &x = u->childs[d]->keys[Pl];
                     x.par = 0;
                     x.PostionE = {u->childs[d]->midx,x.Postion.y};
-                    x.PostionPar = {u->midx,u->keys[Pl].Postion.y};
+                    x.PostionPar = {u->midx,u->keys[0].Postion.y};
                 }
                 else if (u->childs[d] != nullptr && d == 0){
                     int Pl = u->childs[d]->poss;
                     key &x = u->childs[d]->keys[Pl];
                     x.par = 0;
                     x.PostionE = {u->childs[d]->midx,x.Postion.y};
-                    x.PostionPar = u->keys[Pl].Postion;
+                    x.PostionPar = u->keys[d].Postion;
                 }
                 else if (u->childs[d] != nullptr && d == k){
                     int Pl = u->childs[d]->poss;
                     key &x = u->childs[d]->keys[Pl];
                     x.par = 0;
                     x.PostionE = {u->childs[d]->midx,x.Postion.y};
-                    x.PostionPar = {u->midx,u->keys[k - 1].Postion.y};
+                    x.PostionPar =  u->keys[d - 1].Postion;
                 }
             }
             
         }
 
         void SetPostion() {
-            Formard(root);
             float r = 21.4;
             float dis = 40;
             float k = 0;
-            for (int i = r ; i >= 10 ; i--) {
-                dis -= 2;
-                r-= 1;
+            for (int i = r ; i >= 5 ; i--) {
+                dis -= 3;
+                r-= 0.6;
                 k = screenWidth - (FindPostion(root,0,dis,150,100,r) - dis - 2*r);
                 if (k > 30) break;
             }
@@ -1047,34 +916,279 @@ private:
             }
         }
 
+        void splitChild(int i,Vertex2* &u, Vertex2* y,std::vector <std::vector<Transforms2> > &Animation) {
 
-        void insert(int x) {
+                std::vector <Transforms2> Anima = Animation.back();
+                for (Transforms2 &v : Anima) v.u = v.v;
+
+                Anima[y->keys[1].pos].v.color = 2;
+                Anima[y->keys[1].pos].u.Af = 0;
+                Animation.push_back(Anima);
+                // Tạo một nút mới để chứa các phần tử lớn hơn của y
+                Vertex2* z = new Vertex2(y->leaf);
+                z->numKeys = 1;
+
+                for (Transforms2 &v : Anima) v.u = v.v;
+
+                Anima[y->keys[0].pos].v.par = 1;
+                Anima[y->keys[0].pos].v.colorE = 0;
+                Anima[y->keys[0].pos].u.colorE = 0;
+                Anima[y->keys[0].pos].v.PostionE =  Anima[y->keys[0].pos].v.Postion;
+                Anima[y->keys[0].pos].u.PostionE = Anima[y->keys[0].pos].v.PostionE;
+                Anima[y->keys[0].pos].v.PostionPar =  Anima[y->keys[1].pos].v.Postion;
+                Anima[y->keys[0].pos].u.PostionPar = Anima[y->keys[0].pos].v.PostionPar;
+
+                Anima[y->keys[2].pos].v.par = 1;
+                Anima[y->keys[2].pos].v.colorE = 0;
+                Anima[y->keys[2].pos].u.colorE = 0;
+                Anima[y->keys[2].pos].v.PostionE =  Anima[y->keys[2].pos].v.Postion;
+                Anima[y->keys[2].pos].u.PostionE = Anima[y->keys[2].pos].v.PostionE;
+                Anima[y->keys[2].pos].v.PostionPar =  Anima[y->keys[1].pos].v.Postion;
+                Anima[y->keys[2].pos].u.PostionPar = Anima[y->keys[2].pos].v.PostionPar;
+
+                // Chuyển phần tử cuối cùng của y sang z
+                z->keys[0] = y->keys[2];
+
+                // Nếu y không phải là nút lá, chuyển các con của y sang z
+                if (!y->leaf) {
+                    for (int j = 0; j < 2; j++) {
+                        z->childs[j] = y->childs[j + 2];
+                        y->childs[j + 2] = nullptr;
+                    }
+                }
+
+                y->numKeys = 1; // Giảm số lượng phần tử của y
+
+                // Dịch chuyển các con của nút hiện tại để tạo chỗ cho z
+                for (int j = u->numKeys; j >= i + 1; j--) {
+                    u->childs[j + 1] = u->childs[j];
+                }
+
+                // Liên kết z với nút hiện tại
+                u->childs[i + 1] = z;
+
+                // Dịch chuyển các phần tử của nút hiện tại để tạo chỗ cho phần tử giữa của y
+                for (int j = u->numKeys - 1; j >= i; j--) {
+                    u->keys[j + 1] = u->keys[j];
+                }
+
+                // Đưa phần tử giữa của y lên nút hiện tại
+                u->keys[i] = y->keys[1];
+                u->keys[i].par = -1;
+                u->numKeys++;
+
+                if (root == y) root = u;
+                SetPostion();
+
+
+                std::vector<Transforms2> Ani(Anima.size());
+
+                if (y == root)
+                GetUI(u,Ani); else GetUI(root,Ani);
+
+                for (int i = 0 ; i < Ani.size() ; i++){
+                    Anima[i].v = Ani[i].v;
+                    if (Anima[i].u.color == 2) Anima[i].v.color = 2;
+                    if (Anima[i].u.color == 1) Anima[i].v.color = 1;
+                    if (Anima[i].u.colorE == 1) Anima[i].v.colorE = 1;
+                }
+                
+                Animation.push_back(Anima);
+            }
+
+        void insertNonFull(Vertex2 *u,int k,key g,std::vector <std::vector<Transforms2> > &Animation) {
+
+            std::vector <Transforms2> Anima = Animation.back();
+            for (Transforms2 &v : Anima){
+                v.u = v.v;
+                if (v.v.color == 2) v.v.color = 1;
+            }
+
+            for (int i = 0 ; i < u->numKeys ; i++) {
+                int x = u->keys[i].pos;
+                Anima[x].u.Af = 0;
+                Anima[x].u.color = 0;
+                Anima[x].v.color = 1;
+            }
+
+            Animation.push_back(Anima);
+
+            int i = u->numKeys - 1;
+
+            // Nếu là nút lá
+            if (u->leaf) {
+                // Dịch chuyển các phần tử lớn hơn để tìm vị trí chèn
+                while (i >= 0 && u->keys[i].val > k) {
+                    u->keys[i + 1] = u->keys[i];
+                    u->childs[i + 1] = u->childs[i];
+                    i--;
+                }
+
+                // Chèn phần tử vào vị trí tìm được
+                u->keys[i + 1] = g;
+
+                u->childs[i + 1] = nullptr;
+                u->numKeys++;
+            } else { // Nếu không phải nút lá
+                // Tìm con phù hợp để di chuyển xuống
+                while (i >= 0 && u->keys[i].val > k) {
+                    i--;
+                }
+
+                Anima = Animation.back();
+                for (Transforms2 &v : Anima) v.u = v.v;
+
+                if (u->childs[i + 1] != nullptr) {
+                    for (int p = 0 ; p < u->childs[i + 1]->numKeys ; p++)
+                    if (u->childs[i + 1]->keys[p].par != -1) {
+                        Anima[u->childs[i + 1]->keys[p].pos].v.colorE = 1;
+                        break;
+                    }
+                    Animation.push_back(Anima);
+                }
+
+                // Kiểm tra xem con đã đầy hay chưa
+                if (u->childs[i + 1]->numKeys == 3) {
+                    // Tách con nếu nó đầy
+                    splitChild(i + 1,u, u->childs[i + 1],Animation);
+
+                    Anima = Animation.back();
+
+
+                    for (Transforms2 &v : Anima){
+                        v.u = v.v;
+                        if (v.u.color == 2) {
+                            v.v.color = 1;
+                            v.u.Af = 0;
+                        }
+                    }
+
+                    Animation.push_back(Anima);
+
+
+                    // Sau khi tách, phần tử ở giữa di chuyển lên, cần kiểm tra lại
+                    if (u->keys[i + 1].val < k) {
+                        i++;
+                    }
+
+                    Anima = Animation.back();
+                    for (Transforms2 &v : Anima) v.u = v.v;
+
+                    if (u->childs[i + 1] != nullptr) {
+                        for (int p = 0 ; p < u->childs[i + 1]->numKeys ; p++)
+                        if (u->childs[i + 1]->keys[p].par != -1) {
+                            Anima[u->childs[i + 1]->keys[p].pos].v.colorE = 1;
+                            break;
+                        }
+                        Animation.push_back(Anima);
+                    }
+                }
+
+                insertNonFull(u->childs[i + 1],k,g,Animation);
+            }
+        }
+
+
+        void insert(int x,std::vector <std::vector<Transforms2> >  &Animation) {
+
+            std::vector <Transforms2> Anima = Animation.back();
+            for (Transforms2 &v : Anima) {
+                v.u = v.v;
+                v.v.color = 0;
+                v.v.colorE = 0;
+                v.u.AE = 0;
+
+                if (v.v.color != v.u.color) v.u.Af = 0;
+            }
+
+            if (Animation.size() == 1) Animation.pop_back();
+            Animation.push_back(Anima);
 
             key g;
             g.val = x;
             g.pos = find();
             Pos[g.pos] = 1;
             if (root->numKeys == 3) {
+
+                for (int i = 0 ; i < 3 ; i++) {
+                    int x = root->keys[i].pos;
+                    Anima[x].u.Af = 0;
+                    Anima[x].v.color = 1;
+                    Anima[x].v.Af = 255;
+                }
+
+                Animation.push_back(Anima);
+
                 Vertex2* s = new Vertex2(false);
 
                 // Đưa root hiện tại thành con của nút mới
                 s->childs[0] = root;
 
                 // Tách root và di chuyển phần tử giữa lên nút mới
-                s->splitChild(0, root);
+                splitChild(0,s, root,Animation);
+
+                Anima = Animation.back();
+
+                for (Transforms2 &v : Anima){
+                    v.u = v.v;
+                    if (v.u.color == 2) {
+                        v.v.color = 1;
+                        v.u.Af = 0;
+                    }
+                }
+
+                Animation.push_back(Anima);
+
+                
 
                 // Chọn con phù hợp để chèn phần tử mới
                 int i = 0;
                 if (s->keys[0].val < x) {
                     i++;
                 }
-                s->childs[i]->insertNonFull(x,g);
 
-                // Thay đổi root
-                root = s;
+                Anima = Animation.back();
+                for (Transforms2 &v : Anima) v.u = v.v;
+
+                if (root->childs[i] != nullptr) {
+                    for (int p = 0 ; p < root->childs[i]->numKeys ; p++)
+                    if (root->childs[i]->keys[p].par != -1) {
+                        Anima[root->childs[i]->keys[p].pos].v.colorE = 1;
+                        break;
+                    }
+                    Animation.push_back(Anima);
+                }
+                insertNonFull(s->childs[i],x,g,Animation);
+
             } else {
-                root->insertNonFull(x,g);
+                insertNonFull(root,x,g,Animation);
             }
+
+            Anima = Animation.back();
+            std::vector <Transforms2> Ani(Pos.size());
+            SetPostion();
+            GetUI(root,Ani);
+
+            for (int i = 0 ; i < Anima.size(); i++) {
+                Ani[i].u = Anima[i].v;
+                Ani[i].v.colorE = Ani[i].u.colorE;
+                Ani[i].v.color = Ani[i].u.color;
+            }
+            Ani[g.pos].u.color = 2;
+            Ani[g.pos].u.Af = 0;
+            Ani[g.pos].u.radius = 4;
+            Ani[g.pos].v.color = 2; 
+            Animation.push_back(Ani);
+
+            for (Transforms2 &v : Ani){
+                v.u = v.v;
+                // if (v.u.color == 1) {
+                //     v.u.Af = 0;
+                //     v.v.color = 0;
+                // }
+            }
+
+            Animation.push_back(Ani);
         }
         
     };
@@ -1084,8 +1198,6 @@ private:
 
     std::vector <std::vector<Transforms2> > Animation;
     std::vector <std::vector <std::vector<Transforms2> > > Unre; 
-    std::vector <std::vector<TransformsEdge> > AnimationEdge;
-    std::vector <std::vector <std::vector<TransformsEdge> > > UnreEdge; 
     std::vector<button_select> remote;
     std::vector <TwoTFTree> UnreAVL;
     TwoTFTree tft;

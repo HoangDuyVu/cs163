@@ -14,7 +14,6 @@ void TTFTree::init(){
     Animation.clear();
     // AnimationEdge.clear();
     Unre.clear();
-    UnreEdge.clear();
     select.init(); 
 
     Persistent = button_select({455,761},{582,23},0,LoadTexture("res/textures/in_app/tua.png"),RAYWHITE);
@@ -73,8 +72,21 @@ void TTFTree::DrawAnimation(std::vector<Transforms2> f,double g){
         Vector2 NewPostionE = NewPos2D(v.u.PostionE,v.v.PostionE,g);
         Vector2 NewPostionPar = NewPos2D(v.u.PostionPar,v.v.PostionPar,g);
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
+        int NewAE = (int) std::min((float)254.0,NewPos1D(v.u.AE,v.v.AE,g));
         NewA = std::max(NewA,0);
-        if (v.v.par != -1) DrawEdge(NewPostionE,NewPostionPar,0,0,NewA);
+        if (v.v.par != -1){
+            DrawEdge2(NewPostionE,NewPostionPar,0,v.u.colorE,255);
+
+            if (v.u.AE == 0) {
+                DrawEdge2(NewPostionE,NewPostionPar,v.v.val,v.v.colorE,NewAE);
+            }
+            else 
+            if (v.v.colorE != v.u.colorE) {
+                NewPostionE = NewPos2D(NewPostionPar,NewPostionE,g);
+             //   std::cout << g << " " << NewPostionE.x << " " << NewPostionE.y << " " << NewPostionPar.x << " " << NewPostionPar.y  << "\n";
+                DrawEdge2(NewPostionE,NewPostionPar,v.v.val,1,255);
+            }
+        }
     }
 
     for (Transforms2 v : f) {
@@ -82,7 +94,8 @@ void TTFTree::DrawAnimation(std::vector<Transforms2> f,double g){
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         double Newr = NewPos1D(v.u.radius,v.v.radius,g);
         NewA = std::max(NewA,0);
-        DrawVertex(NewPostion,Newr,v.v.val,v.v.color,NewA);
+        if (v.v.color != v.u.color) DrawVertexL(NewPostion,Newr,v.v.val,v.u.color,255);
+        DrawVertexL(NewPostion,Newr,v.v.val,v.v.color,NewA);
     }
 
 }
@@ -190,7 +203,6 @@ void TTFTree::SolveRemote(){
                 }
                 else {
                     Animation = Unre[Pos_unre];
-                    // AnimationEdge = UnreEdge[Pos_unre];
                     tft = UnreAVL[Pos_unre];
                     pause = 1;
                     pos_ani = Animation.size() - 1;
@@ -203,7 +215,6 @@ void TTFTree::SolveRemote(){
             if (Pos_unre + 1 < Unre.size()){
                 Pos_unre++;
                 Animation = Unre[Pos_unre];
-                // AnimationEdge = UnreEdge[Pos_unre];
                 tft = UnreAVL[Pos_unre];
                 pause = 1;
                 pos_ani = Animation.size() - 1;
@@ -430,30 +441,29 @@ void TTFTree::SelectPress(int pos) {
 }
 
 void TTFTree::loadfile() {
-    tft = TwoTFTree(Limitnode);
+    tft = TwoTFTree(LimitNode + 30);
     Animation.clear();
-    // AnimationEdge.clear();
+    std::vector<Transforms2> Anima(tft.Pos.size());
+    tft.SetPostion();
+    tft.GetUI(tft.root,Anima);
+    Animation.push_back(Anima);
 
     std::ifstream fin;
     fin.open(pathfile);
     int n;
     fin >> n;
-    n = std::min(n,Limitnode);
+    n = std::min(n,50);
     for (int i = 0 ; i < n ; i++) {
         int x;
         fin >> x;
+        tft.insert(x,Animation);
     //    avl.root = avl.Insert(avl.root,-1,0,x,Animation,// AnimationEdge);
     }
 
+    Animation.erase(Animation.begin());
+
     fin.close();
 
-
-    std::vector <Transforms2> f(Limitnode);
-    std::vector <TransformsEdge> g(Limitnode);
-  //  avl.dfs(avl.root,avl.root,120,screenWidth - 120,100,60,f,g);
-
-    Animation.push_back(f);
-    // AnimationEdge.push_back(g);
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -461,31 +471,31 @@ void TTFTree::loadfile() {
 
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
-        UnreEdge.pop_back();
         UnreAVL.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
-    UnreAVL.push_back(tft);
+    TwoTFTree tft2 = tft;
+    tft2.root = tft2.Save(tft2.root);
+    UnreAVL.push_back(tft2);
 }
 
 void TTFTree::create(int n){
     tft = TwoTFTree(LimitNode + 30);
     Animation.clear();
-    for (int i = 0 ; i < n ; i++) {
-        int x = rng() % 100;
-        tft.insert(x);
-    }
-
-    std:: cout << tft.Pos.size() << "\n";
-
     std::vector<Transforms2> Anima(tft.Pos.size());
     tft.SetPostion();
     tft.GetUI(tft.root,Anima);
-
     Animation.push_back(Anima);
+    for (int i = 0 ; i < n ; i++) {
+        int x = rng() % 100;
+        tft.insert(x,Animation);
+    }
+
+    Animation.erase(Animation.begin());
+
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -493,14 +503,15 @@ void TTFTree::create(int n){
 
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
-        UnreEdge.pop_back();
         UnreAVL.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
-    UnreAVL.push_back(tft);
+    TwoTFTree tft2 = tft;
+    tft2.root = tft2.Save(tft2.root);
+    UnreAVL.push_back(tft2);
 }
 
 
@@ -511,16 +522,8 @@ void TTFTree::insert(int v){
     tft.SetPostion();
     tft.GetUI(tft.root,Anima);
     Animation.push_back(Anima);
-    tft.insert(v);
-
-    std::vector<Transforms2> Anima2(tft.Pos.size());
-    tft.SetPostion();
-    tft.GetUI(tft.root,Anima2);
-
-    for (int i = 0 ; i < Anima.size() ; i++)
-    Anima2[i].u = Anima[i].v;
-
-    Animation.push_back(Anima2);
+    tft.insert(v,Animation);
+    Animation.erase(Animation.begin());
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -528,24 +531,27 @@ void TTFTree::insert(int v){
 
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
-        UnreEdge.pop_back();
         UnreAVL.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
-    UnreAVL.push_back(tft);
+
+    TwoTFTree tft2 = tft;
+    tft2.root = tft2.Save(tft2.root);
+    UnreAVL.push_back(tft2);
 }
 
 void TTFTree::search(int v){
+
     Animation.clear();
-    // AnimationEdge.clear();
-
-  //  int x = avl.FindRight(avl.root,avl.root,120,120,60,60);
-   // std::cout << "t43345 " << x << "\n";
-
-  //  avl.search(avl.root,-1,0,v,Animation,// AnimationEdge);
+    std::vector<Transforms2> Anima(tft.Pos.size());
+    tft.SetPostion();
+    tft.GetUI(tft.root,Anima);
+    Animation.push_back(Anima);
+    tft.search(v,Animation);
+    Animation.erase(Animation.begin());
     pause = 0;
     pos_ani = 0;
     LastTime = GetTime();
@@ -553,14 +559,16 @@ void TTFTree::search(int v){
 
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
-        UnreEdge.pop_back();
         UnreAVL.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
-    UnreAVL.push_back(tft);
+
+    TwoTFTree tft2 = tft;
+    tft2.root = tft2.Save(tft2.root);
+    UnreAVL.push_back(tft2);
 }
 
 void TTFTree::Select(int k){
@@ -578,7 +586,6 @@ void TTFTree::Select(int k){
 
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
-        UnreEdge.pop_back();
         UnreAVL.pop_back();
     }
 

@@ -5,6 +5,7 @@
 #include <HeapTree.hpp>
 #include <AVLTree.hpp>
 #include <TTFTree.hpp>
+#include <Trie.hpp>
 #include <Hashtable.hpp>
 #include <iostream>
 
@@ -14,7 +15,7 @@ HeapTree heaptree;
 AVLTree avltree;
 Hashtable hashtable;
 TTFTree ttftree;
-
+Trie trie;
 
 
 void init(){
@@ -24,6 +25,7 @@ void init(){
     avltree.init();
     hashtable.init();
     ttftree.init();
+    trie.init();
 }
 
 void Activities() {
@@ -43,6 +45,11 @@ void Activities() {
         if (x == 3) {
             pos = HASHTABLE;
             hashtable.init();
+        }
+
+        if (x == 4) {
+            pos = TRIE;
+            trie.init();
         }
 
         if (x == 2) {
@@ -66,6 +73,10 @@ void Activities() {
     if (pos == TTFTREE) {
         ttftree.Activity();
     }
+
+    if (pos == TRIE) {
+        trie.Activity();
+    }
 }
 
 void draw() {
@@ -88,5 +99,9 @@ void draw() {
     else if (pos == TTFTREE) {
         viewapp.draw();
         ttftree.draw();
+    }
+    else if (pos == TRIE) {
+        viewapp.draw();
+        trie.draw();
     }
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <raylib.h>
-#include <TTFTree.hpp>
+#include <Trie.hpp>
 #include <variable.hpp>
 #include <ViewInApp.hpp>
 #include <activities.hpp>
@@ -9,7 +9,7 @@
 #include <fstream>
 
 
-void TTFTree::init(){
+void Trie::init(){
     tft = TwoTFTree(Limitnode);
     Animation.clear();
     // AnimationEdge.clear();
@@ -46,7 +46,7 @@ void TTFTree::init(){
     sel_i = 0;
 }
 
-int TTFTree::UpdatePressOn(){
+int Trie::UpdatePressOn(){
     bool Press = 0;
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) Press = 1;
     int res = viewapp.UpdatePressOn(Press);
@@ -58,15 +58,15 @@ int TTFTree::UpdatePressOn(){
     return -1;
 }
 
-Vector2 TTFTree::NewPos2D(Vector2 A,Vector2 B,float g) {
+Vector2 Trie::NewPos2D(Vector2 A,Vector2 B,float g) {
     return {A.x + (B.x - A.x)*g,A.y + (B.y - A.y)*g};
 }
 
-float TTFTree::NewPos1D(float x, float y, float g) {
+float Trie::NewPos1D(float x, float y, float g) {
     return x + (y - x)*g;
 }
 
-void TTFTree::DrawAnimation(std::vector<Transforms2> f,double g){
+void Trie::DrawAnimation(std::vector<Transforms2> f,double g){
     for (Transforms2 v : f) {
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
         Vector2 NewPostionE = NewPos2D(v.u.PostionE,v.v.PostionE,g);
@@ -100,7 +100,7 @@ void TTFTree::DrawAnimation(std::vector<Transforms2> f,double g){
 
 }
 
-void TTFTree::UpdatePostionNodePer(){
+void Trie::UpdatePostionNodePer(){
 
     if (NodePersistent.CheckMouse(GetMousePosition(),1) && IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
         checkNodePer = 1; 
@@ -136,7 +136,7 @@ void TTFTree::UpdatePostionNodePer(){
 
 }
 
-void TTFTree::SolveRemote(){
+void Trie::SolveRemote(){
 
     if (pause == 0) {
         button_select &v = remote[4];
@@ -239,7 +239,7 @@ void TTFTree::SolveRemote(){
     if (pause == 2)  remote[6].DrawBasic(0.6);
 }
 
-void TTFTree::draw(){
+void Trie::draw(){
     SolveRemote();
     Vector2 Mouse = GetMousePosition();
     UpdatePostionNodePer();
@@ -308,7 +308,7 @@ void TTFTree::draw(){
     select.draw();
 }
 
-int TTFTree::Select::checkPressOn(bool Press){
+int Trie::Select::checkPressOn(bool Press){
             if (Press && CheckMouse(GetMousePosition(),1)) return 0;
             int d = 1;
 
@@ -389,7 +389,7 @@ int TTFTree::Select::checkPressOn(bool Press){
             return -1;
         }
 
-void TTFTree::Activity(){
+void Trie::Activity(){
 
  //   LimitNode = avl.GetSize();
     int g = UpdatePressOn();
@@ -433,14 +433,14 @@ void TTFTree::Activity(){
    // if (g != -1) std::cout << g << "\n";
 }
 
-void TTFTree::SelectPress(int pos) {
+void Trie::SelectPress(int pos) {
     select.sel[pos].press ^= 1;
     if (select.sel[pos].press)
     for (int i = 0 ; i < 5 ; i++)
         if (i != pos) select.sel[i].press = 0;
 }
 
-void TTFTree::loadfile() {
+void Trie::loadfile() {
     tft = TwoTFTree(LimitNode + 30);
     Animation.clear();
     std::vector<Transforms2> Anima(tft.Pos.size());
@@ -497,7 +497,7 @@ void TTFTree::loadfile() {
     UnreAVL.push_back(tft2);
 }
 
-void TTFTree::create(int n){
+void Trie::create(int n){
     tft = TwoTFTree(LimitNode + 30);
     Animation.clear();
     std::vector<Transforms2> Anima(tft.Pos.size());
@@ -546,7 +546,7 @@ void TTFTree::create(int n){
 }
 
 
-void TTFTree::insert(int v){
+void Trie::insert(int v){
 
     Animation.clear();
     std::vector<Transforms2> Anima(tft.Pos.size());
@@ -574,7 +574,7 @@ void TTFTree::insert(int v){
     UnreAVL.push_back(tft2);
 }
 
-void TTFTree::search(int v){
+void Trie::search(int v){
 
     Animation.clear();
     std::vector<Transforms2> Anima(tft.Pos.size());
@@ -602,7 +602,7 @@ void TTFTree::search(int v){
     UnreAVL.push_back(tft2);
 }
 
-void TTFTree::Select(int k){
+void Trie::Select(int k){
 
   //  if (k > avl.GetSize()) return ;
     Animation.clear();
@@ -627,7 +627,7 @@ void TTFTree::Select(int k){
 }
 
 
-void TTFTree::Notification(){
+void Trie::Notification(){
 
     if (!CheckNotification) return ;
     const char *message = "You have reached the node of the tree";

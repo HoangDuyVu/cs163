@@ -1190,6 +1190,74 @@ private:
 
             Animation.push_back(Ani);
         }
+
+        void search(int x,Vertex2* u,std::vector <std::vector<Transforms2> >  &Animation) {
+            std::vector <Transforms2> Anima = Animation.back();
+            for (Transforms2 &v : Anima){
+                v.u = v.v;
+                if (v.v.color == 2) v.v.color = 1;
+            }
+
+            for (int i = 0 ; i < u->numKeys ; i++) {
+                int x = u->keys[i].pos;
+                Anima[x].u.Af = 0;
+                Anima[x].u.color = 0;
+                Anima[x].v.color = 1;
+            }
+
+            Animation.push_back(Anima);
+
+            int i = u->numKeys - 1;
+
+            for (int j = 0 ; j <= i ; j++) 
+            if (u->keys[j].val == x) {
+                for (Transforms2 &v : Anima) v.u = v.v;
+                Anima[u->keys[j].pos].v.color = 2;
+                Anima[u->keys[j].pos].u.Af = 0;
+                Animation.push_back(Anima);
+                return ;
+            }
+
+            // Nếu là nút lá
+            if (u->leaf) {
+                Anima = Animation.back();
+                for (Transforms2 &v : Anima){
+                    v.u = v.v;
+                    if (v.v.color != 0) {
+                        v.v.color = 0;
+                        v.u.Af = 0;
+                    } 
+
+                    if (v.v.colorE != 0) {
+                        v.v.colorE = 0;
+                        v.u.AE = 0;
+                    }
+                }
+
+                Animation.push_back(Anima);
+                return ;
+            } else { // Nếu không phải nút lá
+                // Tìm con phù hợp để di chuyển xuống
+                while (i >= 0 && u->keys[i].val > x) {
+                    i--;
+                }
+
+                Anima = Animation.back();
+                for (Transforms2 &v : Anima) v.u = v.v;
+
+                if (u->childs[i + 1] != nullptr) {
+                    for (int p = 0 ; p < u->childs[i + 1]->numKeys ; p++)
+                    if (u->childs[i + 1]->keys[p].par != -1) {
+                        Anima[u->childs[i + 1]->keys[p].pos].v.colorE = 1;
+                        break;
+                    }
+                    Animation.push_back(Anima);
+                }
+
+
+                search(x,u->childs[i + 1],Animation);
+            }  
+        }
         
     };
 

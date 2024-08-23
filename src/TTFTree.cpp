@@ -460,6 +460,22 @@ void TTFTree::loadfile() {
     //    avl.root = avl.Insert(avl.root,-1,0,x,Animation,// AnimationEdge);
     }
 
+    Anima = Animation.back();
+    for (Transforms2 &v : Anima){
+        v.u = v.v;
+        if (v.v.color != 0) {
+            v.v.color = 0;
+            v.u.Af = 0;
+        } 
+
+        if (v.v.colorE != 0) {
+            v.v.colorE = 0;
+            v.u.AE = 0;
+        }
+    }
+
+    Animation.push_back(Anima);
+
     Animation.erase(Animation.begin());
 
     fin.close();
@@ -493,6 +509,22 @@ void TTFTree::create(int n){
         int x = rng() % 100;
         tft.insert(x,Animation);
     }
+
+    Anima = Animation.back();
+    for (Transforms2 &v : Anima){
+        v.u = v.v;
+        if (v.v.color != 0) {
+            v.v.color = 0;
+            v.u.Af = 0;
+        } 
+
+        if (v.v.colorE != 0) {
+            v.v.colorE = 0;
+            v.u.AE = 0;
+        }
+    }
+
+    Animation.push_back(Anima);
 
     Animation.erase(Animation.begin());
 
@@ -550,7 +582,7 @@ void TTFTree::search(int v){
     tft.SetPostion();
     tft.GetUI(tft.root,Anima);
     Animation.push_back(Anima);
-    tft.search(v,Animation);
+    tft.search(v,tft.root,Animation);
     Animation.erase(Animation.begin());
     pause = 0;
     pos_ani = 0;

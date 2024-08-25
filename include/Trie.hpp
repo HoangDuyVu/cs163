@@ -982,9 +982,12 @@ private:
             if (id == ((int)(s.size())) - 1){
 
                 if (u->keys.end > 0){
+                    u->keys.end--;
                     if (u->keys.f-- == 1){
                         for (Transforms2 & v : Anima) v.u = v.v;   
                         int pos = u->keys.pos;
+                        Anima[pos].v.end = 0;
+                        Anima[pos].u.end = 0;
                         Anima[pos].v.Af = 0;
                         Anima[pos].v.PostionE = Anima[pos].v.PostionPar;
                         Animation.push_back(Anima);
@@ -992,6 +995,15 @@ private:
                         Pos[pos] = 0;
                         u->keys.pos = -1;
                         Anima[pos].v.pos = -1;
+                    } else {
+                        for (Transforms2 & v : Anima) v.u = v.v;   
+                        int pos = u->keys.pos;
+                        Anima[pos].v.end--;
+                        Anima[pos].u.end--;
+                        Anima[pos].v.color = 0;
+                        Anima[pos].u.Af = 0;
+                        Anima[pos].v.colorE = 0;
+                        Animation.push_back(Anima);    
                     }
 
                     return true;
@@ -1011,6 +1023,12 @@ private:
             for (Vertex2* v : u->childs) if (v->keys.val == s[id + 1]) k = v;
 
             if (k == nullptr) {
+                for (Transforms2 & v : Anima) v.u = v.v;   
+                int pos = u->keys.pos;
+                Anima[pos].v.color = 0;
+                Anima[pos].u.Af = 0;
+                Anima[pos].v.colorE = 0;
+                Animation.push_back(Anima);
                 return false;
             }
             else {

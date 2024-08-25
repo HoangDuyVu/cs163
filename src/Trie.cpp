@@ -542,7 +542,7 @@ void Trie::create(int n){
         x.clear();
         int n = rng() % 6 + 1;
 
-        for (int j = 0 ; j < n ; j++)x += rng() % 26 + 'a';
+        for (int j = 0 ; j < n ; j++)x += rng() % 6 + 'a';
         tft.insert(x,Animation);
     }
 
@@ -641,7 +641,7 @@ void Trie::insert(std::string s){
 }
 
 void Trie::DElete(std::string v){
-    std::cout << "coooo " << v << "\n";
+   // std::cout << "coooo " << v << "\n";
     Animation.clear();
     std::vector<Transforms2> Anima(tft.Pos.size());
     tft.SetPostion();

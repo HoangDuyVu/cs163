@@ -11,6 +11,7 @@ int sel_n;
 int sel_v;
 int sel_k;
 int sel_i;
+std::string sel_s;
 Texture2D L1,L2,L3;
 int LimitNode;
 char pathfile[40];
@@ -21,7 +22,7 @@ Pos pos;
 Texture2D Logo;
 Font customFont;
 
-double deltaTime = 1.0f;
+double deltaTime = 0.5f;
 
 void init_bg(){ 
     L1 = LoadTexture("res/textures/node/node1.png");
@@ -99,6 +100,40 @@ void DrawVertex(Vector2 Postion,float radius,int val, int kind_color,unsigned ch
     }
 }
 
+void DrawVertexText2(Vector2 Postion,float radius,char* text, int kind_color,unsigned char a) {
+    int fontSize = 10;
+    for (int i = 11 ; i <= 70 ; i++) {
+        Vector2 k = MeasureTextEx(customFont, text, i, 0);
+        if (std::max(k.x,k.y) <= radius*7/5) fontSize = i;
+        else break;
+    }
+
+    Vector2 textSize = MeasureTextEx(customFont, text, fontSize, 0);
+
+    Vector2 textPosition = {
+        Postion.x - textSize.x / 2,
+        Postion.y - textSize.y / 2
+    };
+
+    if (kind_color == 0) {
+        DrawCircle(Postion.x,Postion.y, radius,Fade(WHITE,1.0*a/255.0));
+        DrawRing(Postion,radius,radius*6/5.0,2,365,200.0f,{107,100,184,a});
+        DrawTextEx(customFont, text, textPosition, fontSize, 0, {107,100,184,a});
+    }
+    else if (kind_color == 1){
+        DrawCircle(Postion.x,Postion.y, radius,Fade(WHITE,1.0*a/255.0));
+        DrawRing(Postion,radius,radius*6/5.0,2,365,200.0f,{249, 150, 211,a});
+        DrawTextEx(customFont, text, textPosition, fontSize, 0, {249, 150, 211,a});
+    }
+    else if (kind_color == 2) {
+        DrawCircle(Postion.x,Postion.y, radius*6/5.0,{249, 150, 211,a});
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(WHITE,1.0*a/255.0));
+    }
+    else if (kind_color == 4){
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,{107,100,184,a});
+    }
+}
+
 void DrawVertexText(Vector2 Postion,float radius,char *text, int fontSize,unsigned char a) {
     Vector2 textSize = MeasureTextEx(customFont, text, fontSize, 0);
     Vector2 textPosition = {
@@ -112,12 +147,12 @@ void DrawVertexText(Vector2 Postion,float radius,char *text, int fontSize,unsign
 
 void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a) {
     if (kind_color == 0) DrawLineEx(PostionX,PostionY,4.0f,{107,100,184,a});
-    else if (kind_color == 1) DrawLineEx(PostionX,PostionY,6.0f,ConstColor2);
+    else if (kind_color == 1) DrawLineEx(PostionX,PostionY,4.0f,ConstColor2);
 }
 
 void DrawEdge2(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a) {
-    if (kind_color == 0) DrawLineEx(PostionX,PostionY,6.0f,{107,100,184,a});
-    else if (kind_color == 1) DrawLineEx(PostionX,PostionY,7.0f,{255, 143, 183,a});
+    if (kind_color == 0) DrawLineEx(PostionX,PostionY,4.0f,{107,100,184,a});
+    else if (kind_color == 1) DrawLineEx(PostionX,PostionY,4.0f,{255, 143, 183,a});
 }
 
 void DrawVertexRoot(Vector2 Postion,float radius,int val, int kind_color,unsigned char a) {

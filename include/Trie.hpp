@@ -49,7 +49,7 @@ private:
                 }
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-                    int n = rng() % (Limitnode + 30 + 1);
+                    int n = rng() % (Limitnode - 10 + 1);
                     if (n == -1) n = 0;
 
                     a[0] = n / 10 + '0';
@@ -72,9 +72,9 @@ private:
 
                     int n = 0;
                     for (int i = 0 ; i < strlen(a); i++) n = n*10 + a[i] - '0';
-                    if (n > Limitnode + 30) {
+                    if (n > Limitnode - 10) {
                     if (n == -1) n = 0;
-                        n = Limitnode + 30;
+                        n = Limitnode - 10;
                         a[0] = n / 10 + '0';
                         a[1] = n % 10 + '0';
                         a[2] = '\0';
@@ -116,17 +116,16 @@ private:
             Rectangle Rect;
             Pointer Pointer_A;
             std::vector <button_select> Item;
-            char a[3];
+            char a[10];
             void init(Vector2 _postion){
                 Postion = _postion;
                 Item.resize(3);
-                Rect = {184,Postion.y,200,40};
-                Pointer_A.init({239,506},{3,16});
-                a[0] = '0';
-                a[1] = '\0';
-                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/V.png"),WHITE);
-                Item[1] = button_select({285,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
-                Item[2] = button_select({331,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
+                Rect = {184,Postion.y,200 + 70,40};
+                Pointer_A.init({239 + 35,506},{3,16});
+                a[0] = '\0';
+                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
+                Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
+                Item[2] = button_select({331 + 70,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
             //  Item[0] = button_select({194,Postion.y + 5},{80,29},1,LoadTexture("res/textures/select/N.png"),WHITE);
                 for (button_select &v : Item) {
                     v.image.height /=4;
@@ -146,26 +145,21 @@ private:
                 }
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-                    a[0] = rng() % 10 + '0';
-                    a[1] = rng() % 10 + '0';
-                    a[2] = '\0';
 
-                    if (a[0] == '0') {
-                        a[0] = a[1];
-                        a[1] = '\0';
-                    }
+                    int n = rng() % 6 + 1;
+
+                    for (int i = 0 ; i < n ; i++) a[i] = rng() % 26 + 'a';
+                    a[n] = '\0';
+
                 }
 
                 int key = GetCharPressed();
                 while (key > 0) {
-                    if ((key >= 48) && (key <= 57) && strlen(a) < 2) {
+                    if ((((key >= 48) && (key <= 57)) || (key >= 'a' && key <= 'z')) && strlen(a) < 6) {
                         int len = strlen(a);
                         a[len] = (char) key;
                         a[len + 1] = '\0';
                     }
-
-                    int n = 0;
-                    for (int i = 0 ; i < strlen(a); i++) n = n*10 + a[i] - '0';
 
                     key = GetCharPressed();
                 }
@@ -182,7 +176,7 @@ private:
                 Vector2 textSize = MeasureTextEx(customFont, a, fontSize, 1);
 
                 Vector2 textPosition = {
-                    Rec.x + (Rec.width - textSize.x) / 2,
+                    247,
                     Rec.y + (Rec.height - textSize.y) / 2
                 };
 
@@ -198,17 +192,16 @@ private:
             Rectangle Rect;
             Pointer Pointer_A;
             std::vector <button_select> Item;
-            char a[3];
+            char a[8];
             void init(Vector2 _postion){
                 Postion = _postion;
                 Item.resize(3);
-                Rect = {184,Postion.y,200,40};
-                Pointer_A.init({239,506},{3,16});
-                a[0] = '0';
-                a[1] = '\0';
-                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/V.png"),WHITE);
-                Item[1] = button_select({285,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
-                Item[2] = button_select({331,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
+                Rect = {184,Postion.y,200 + 70,40};
+                Pointer_A.init({239 + 35,506},{3,16});
+                a[0] = '\0';
+                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
+                Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
+                Item[2] = button_select({331 + 70,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
 
                 for (button_select &v : Item) {
                     v.image.height /=4;
@@ -230,42 +223,20 @@ private:
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
 
-                    int n = rng() % 100;
-                    if (n == -1) n = 0;
+                    int n = rng() % 6 + 1;
 
-                    a[0] = n / 10 + '0';
-                    a[1] = n % 10 + '0';
-                    a[2] = '\0';
+                    for (int i = 0 ; i < n ; i++) a[i] = rng() % 26 + 'a';
+                    a[n] = '\0';
 
-                    if (a[0] == '0') {
-                        a[0] = a[1];
-                        a[1] = '\0';
-                    }
                 }
 
                 int key = GetCharPressed();
                 while (key > 0) {
-                    if ((key >= 48) && (key <= 57) && strlen(a) < 2) {
+                    if ((((key >= 48) && (key <= 57)) || (key >= 'a' && key <= 'z')) && strlen(a) < 6) {
                         int len = strlen(a);
                         a[len] = (char) key;
                         a[len + 1] = '\0';
                     }
-
-                    int n = 0;
-                    for (int i = 0 ; i < strlen(a); i++) n = n*10 + a[i] - '0';
-
-                    // if (n > LimitNode) {
-                    //     n = std::max(0,LimitNode);
-                    //     if (n < 9) {
-                    //         a[0] = n + '0';
-                    //         a[1] = '\0';
-                    //     }
-                    //     else {
-                    //         a[0] = n/10 + '0';
-                    //         a[1] = n % 10 + '0';
-                    //         a[2] = '\0';
-                    //     }
-                    // }
 
                     key = GetCharPressed();
                 }
@@ -282,7 +253,7 @@ private:
                 Vector2 textSize = MeasureTextEx(customFont, a, fontSize, 1);
 
                 Vector2 textPosition = {
-                    Rec.x + (Rec.width - textSize.x) / 2,
+                    247,
                     Rec.y + (Rec.height - textSize.y) / 2
                 };
 
@@ -298,17 +269,16 @@ private:
             Rectangle Rect;
             Pointer Pointer_A;
             std::vector <button_select> Item;
-            char a[3];
+            char a[10];
             void init(Vector2 _postion){
                 Postion = _postion;
                 Item.resize(3);
-                Rect = {184,Postion.y,200,40};
-                Pointer_A.init({239,506},{3,16});
-                a[0] = '0';
-                a[1] = '\0';
-                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/K.png"),WHITE);
-                Item[1] = button_select({285,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
-                Item[2] = button_select({331,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
+                Rect = {184,Postion.y,200 + 70,40};
+                Pointer_A.init({239 + 35,506},{3,16});
+                a[0] = '\0';
+                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
+                Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
+                Item[2] = button_select({331 + 70,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
 
                 for (button_select &v : Item) {
                     v.image.height /=4;
@@ -329,41 +299,20 @@ private:
                 }
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-                    int n = rng() % (LimitNode) + 1;
-                    if (n == -1) n = 0;
 
-                    a[0] = n / 10 + '0';
-                    a[1] = n % 10 + '0';
-                    a[2] = '\0';
+                    int n = rng() % 6 + 1;
 
-                    if (a[0] == '0') {
-                        a[0] = a[1];
-                        a[1] = '\0';
-                    }
+                    for (int i = 0 ; i < n ; i++) a[i] = rng() % 26 + 'a';
+                    a[n] = '\0';
+
                 }
 
                 int key = GetCharPressed();
                 while (key > 0) {
-                    if ((key >= 48) && (key <= 57) && strlen(a) < 2) {
+                    if ((((key >= 48) && (key <= 57)) || (key >= 'a' && key <= 'z')) && strlen(a) < 6) {
                         int len = strlen(a);
                         a[len] = (char) key;
                         a[len + 1] = '\0';
-                    }
-
-                    int n = 0;
-                    for (int i = 0 ; i < strlen(a); i++) n = n*10 + a[i] - '0';
-
-                    if (n > LimitNode) {
-                        n = std::max(0,LimitNode);
-                        if (n < 9) {
-                            a[0] = n + '0';
-                            a[1] = '\0';
-                        }
-                        else {
-                            a[0] = n/10 + '0';
-                            a[1] = n % 10 + '0';
-                            a[2] = '\0';
-                        }
                     }
 
                     key = GetCharPressed();
@@ -381,7 +330,7 @@ private:
                 Vector2 textSize = MeasureTextEx(customFont, a, fontSize, 1);
 
                 Vector2 textPosition = {
-                    Rec.x + (Rec.width - textSize.x) / 2,
+                    247,
                     Rec.y + (Rec.height - textSize.y) / 2
                 };
 
@@ -675,7 +624,7 @@ private:
             sel[0] = choose(Create, Vector2 {27,536},Vector2 {150,40},"Create",ConstColor1,ConstColor2,0);
             sel[1] = choose(Insert, Vector2 {27,576},Vector2 {150,40},"Insert",ConstColor1,ConstColor2,0);
             sel[2] = choose(Search, Vector2 {27,616},Vector2 {150,40},"Search",ConstColor1,ConstColor2,0);
-            sel[3] = choose(Delete, Vector2 {27,656},Vector2 {150,40},"Select",ConstColor1,ConstColor2,0);
+            sel[3] = choose(Delete, Vector2 {27,656},Vector2 {150,40},"Delete",ConstColor1,ConstColor2,0);
             sel[4] = choose(file, Vector2 {27,496},Vector2 {150,40},"File",ConstColor1,ConstColor2,0);
         }
 
@@ -721,12 +670,13 @@ private:
         int Af , AE;
         int color, colorE;
         int pos;
-        int val;
+        char val;
         int par;
         int f;
+        int end;
         int radius;
         int posVal;
-        key(int _val = 0) {
+        key(char _val = 0) {
             val = _val;
             color = 0;
             colorE = 0;
@@ -734,6 +684,8 @@ private:
             Af = 255;
             AE = 255;
             f = 0;
+            end = 0;
+            pos = -1;
         }
     };
 
@@ -746,7 +698,7 @@ private:
     struct Vertex2 {
         Vector2 Postion;
         float radius; 
-        bool NotDeath;
+        bool death;
         int leaf;
         int poss = 0;
         float midx;
@@ -755,17 +707,17 @@ private:
         std::vector <Vertex2*> childs; 
         int numKeys;   
 
-        Vertex2(int _leaf = 0) {
-            leaf = _leaf;
-            NotDeath = 1;
+        Vertex2(int val = 0) {
+            keys = key(val);
             numKeys = 0;
+            death = 0;
             childs.clear();
         }
 
-        Vertex2(Vector2 Postion,float radius,bool NotDeath):
+        Vertex2(Vector2 Postion,float radius,bool death):
         Postion(Postion),
         radius(radius),
-        NotDeath(NotDeath)
+        death(death)
         {}
     };
 
@@ -778,8 +730,10 @@ private:
         std::map<int,int> Pos;
 
         TwoTFTree(int cap = 0) {
-            root = new Vertex2(1);
+            root = new Vertex2(-1);
             Pos.clear();
+            root->keys.pos = find();
+            Pos[root->keys.pos] = 1;
         }
 
         int find() {
@@ -819,15 +773,18 @@ private:
             int dd = 0;
 
             for (Vertex2 * v : u->childs) {
-                g = FindPostion(v,t,f,h,delh,r);
+                g = FindPostion(v,g,f,h + delh,delh,r);
             }
 
             if (mid == -1)  mid = (std::max(g  - f - 2*r,t) + t) / 2.0;
 
             u->keys.Postion = {mid,h};
             u->keys.radius = r;
+            if (u->keys.pos == 0) u->keys.Postion.y -= 50;
 
-            return std::max(g,mid + 2*r);
+           // std::cout << u->keys.val << " " << 
+
+            return std::max(g,mid + 3*r);
         }
 
         void PostionEdge(Vertex2 * u,Vertex2 * par) {
@@ -852,10 +809,12 @@ private:
             for (int i = r ; i >= 5 ; i--) {
                 dis -= 3;
                 r-= 0.6;
-                k = screenWidth - (FindPostion(root,0,dis,150,100,r) - dis - 2*r);
+                k = screenWidth - (FindPostion(root,0,dis,150,70,r) - dis - 2*r);
                 if (k > 30) break;
             }
-            FindPostion(root,k/2.0,dis,150,100,r);
+
+            std::cout << "-----\n";
+            FindPostion(root,k/2.0,dis,150,70,r);
             PostionEdge(root,nullptr);
         }
 
@@ -864,15 +823,281 @@ private:
             key v = u->keys;
             Anima[v.pos].u = Anima[v.pos].v = v;
             for (Vertex2* v : u->childs) 
-                GetUI(v,Anima);
+            GetUI(v,Anima);
         }
 
-        void insert(int x,std::vector <std::vector<Transforms2> >  &Animation) {
+        void IN(Vertex2 *u,int id,std::string &s,std::vector <std::vector<Transforms2> >  &Animation) {
+            std::vector<Transforms2> Anima = Animation.back();
+            for (Transforms2 & v : Anima) v.u = v.v;
+            Anima[u->keys.pos].v.color = 1;
+            Anima[u->keys.pos].u.Af = 1;
+            Anima[u->keys.pos].v.f++;
+            u->keys.f++;
+            if (id == ((int)(s.size())) - 1){
+                Anima[u->keys.pos].v.end++;
+                u->keys.end++;
+            }
+
+            Animation.push_back(Anima);
+
+            if (id == ((int)(s.size())) - 1) return ;
+
+            Vertex2* k = nullptr;
+            for (Vertex2* v : u->childs) if (v->keys.val == s[id + 1]) k = v;
+
+            if (k == nullptr) {
+
+                std::cout << s << "\n";
+                Vertex2 *x = new Vertex2(s[id + 1]);
+                x->keys.pos = find();
+                Pos[x->keys.pos] = 1;
+                u->childs.push_back(x);
+
+                std::vector <Transforms2> Ani(Pos.size());
+                SetPostion();
+                GetUI(root,Ani);
+                for (Transforms2 & v : Anima) v.u = v.v;
+                for (int i = 0 ; i < Anima.size() ; i++) {
+                    Ani[i].u = Anima[i].v;
+                    Ani[i].v.color = Anima[i].v.color;
+                    Ani[i].v.colorE = Anima[i].v.colorE;
+                    Ani[i].v.Af = Anima[i].v.Af;
+                    Ani[i].v.AE = Anima[i].v.AE;
+                }
+                
+                int pos = x->keys.pos;
+                Ani[pos].u.PostionE = Ani[pos].v.PostionPar;
+                Ani[pos].u.PostionPar = Ani[pos].v.PostionPar;
+             //   std::cout << u->keys.Postion.x << " " << u->keys.Postion.y << "\n";
+                Ani[pos].u.colorE = Ani[pos].v.colorE = 1;
+                Ani[pos].u.Postion = Ani[pos].v.Postion;
+                Ani[pos].u.radius = Ani[pos].v.radius;
+                Ani[pos].u.Af = 0, Ani[pos].v.color = 0;
+                Animation.push_back(Ani);
+
+                IN(x,id + 1,s,Animation);
+            }
+            else {
+                Anima = Animation.back();
+                for (Transforms2 & v : Anima) v.u = v.v;
+                Anima[k->keys.pos].v.colorE = 1;
+                Anima[k->keys.pos].u.colorE = 0;
+                Animation.push_back(Anima);
+                IN(k,id + 1,s,Animation);
+            }
+
         }
 
-        void search(int x,Vertex2* u,std::vector <std::vector<Transforms2> >  &Animation) {
+        void SR(Vertex2 *u,int id,std::string &s,std::vector <std::vector<Transforms2> >  &Animation) {
+            std::vector<Transforms2> Anima = Animation.back();
+            for (Transforms2 & v : Anima) v.u = v.v;
+            Anima[u->keys.pos].v.color = 1;
+            Anima[u->keys.pos].u.Af = 1;
+            if (id == ((int)(s.size())) - 1){
+            //    std::cout << "co khong? :" << u->keys.end << "\n";
+                if (u->keys.end) {
+                    Anima[u->keys.pos].v.color = 2;
+                }
+            }
+
+            Animation.push_back(Anima);
+
+            if (id == ((int)(s.size())) - 1) return ;
+
+            Vertex2* k = nullptr;
+            for (Vertex2* v : u->childs) if (v->keys.val == s[id + 1]) k = v;
+
+            if (k == nullptr) {
+                return ;
+            }
+            else {
+                Anima = Animation.back();
+                for (Transforms2 & v : Anima) v.u = v.v;
+                Anima[k->keys.pos].v.colorE = 1;
+                Anima[k->keys.pos].u.colorE = 0;
+                Animation.push_back(Anima);
+                SR(k,id + 1,s,Animation);
+            }
+
         }
-        
+
+        void insert(std::string x,std::vector <std::vector<Transforms2> >  &Animation) {
+            std::vector<Transforms2> Anima = Animation.back();
+            int d = 0;
+            for (Transforms2 & v : Anima) {
+                v.u = v.v;
+                if (v.v.color != 0) {
+                    v.v.color = 0;
+                    d = 1;
+                }
+                if (v.v.colorE != 0) {
+                    v.v.colorE = 0;
+                    v.u.AE = 0;
+                    d = 1;
+                }
+            }
+
+            if (d == 1) Animation.push_back(Anima);
+            IN(root,-1,x,Animation);
+        }
+
+        void search(std::string x,std::vector <std::vector<Transforms2> >  &Animation) {
+            std::vector<Transforms2> Anima = Animation.back();
+            int d = 0;
+            for (Transforms2 & v : Anima) {
+                v.u = v.v;
+                if (v.v.color != 0) {
+                    v.v.color = 0;
+                    d = 1;
+                }
+                if (v.v.colorE != 0) {
+                    v.v.colorE = 0;
+                    v.u.AE = 0;
+                    d = 1;
+                }
+            }
+
+            std::cout << x << "\n";
+
+            if (d == 1) Animation.push_back(Anima);
+            SR(root,-1,x,Animation);
+        }
+
+        bool Del(Vertex2 *u,int id,std::string &s,std::vector <std::vector<Transforms2> >  &Animation) {
+            std::vector<Transforms2> Anima = Animation.back();
+            for (Transforms2 & v : Anima){
+                v.u = v.v;
+            }
+            Anima[u->keys.pos].v.color = 1;
+            Anima[u->keys.pos].u.Af = 1;
+            if (id == ((int)(s.size())) - 1){
+            //    std::cout << "co khong? :" << u->keys.end << "\n";
+                if (u->keys.end) {
+                    Anima[u->keys.pos].v.color = 2;
+                }
+            }
+
+            Animation.push_back(Anima);
+
+            if (id == ((int)(s.size())) - 1){
+
+                if (u->keys.end > 0){
+                    if (u->keys.f-- == 1){
+                        for (Transforms2 & v : Anima) v.u = v.v;   
+                        int pos = u->keys.pos;
+                        Anima[pos].v.Af = 0;
+                        Anima[pos].v.PostionE = Anima[pos].v.PostionPar;
+                        Animation.push_back(Anima);
+
+                        Pos[pos] = 0;
+                        u->keys.pos = -1;
+                        Anima[pos].v.pos = -1;
+                    }
+
+                    return true;
+                }
+                else {
+                    for (Transforms2 & v : Anima) v.u = v.v;   
+                    int pos = u->keys.pos;
+                    Anima[pos].v.color = 0;
+                    Anima[pos].u.Af = 0;
+                    Anima[pos].v.colorE = 0;
+                    Animation.push_back(Anima);
+                }
+                return false;
+            }
+
+            Vertex2* k = nullptr;
+            for (Vertex2* v : u->childs) if (v->keys.val == s[id + 1]) k = v;
+
+            if (k == nullptr) {
+                return false;
+            }
+            else {
+                Anima = Animation.back();
+                for (Transforms2 & v : Anima) v.u = v.v;
+                Anima[k->keys.pos].v.colorE = 1;
+                Anima[k->keys.pos].u.colorE = 0;
+                Animation.push_back(Anima);
+                int g = Del(k,id + 1,s,Animation);
+                Anima = Animation.back();
+                if (g == 0) {
+                    for (Transforms2 & v : Anima) v.u = v.v;   
+                    int pos = u->keys.pos;
+                    Anima[pos].v.color = 0;
+                    Anima[pos].u.Af = 0;
+                    Anima[pos].v.colorE = 0;
+                    Animation.push_back(Anima);
+                    return g;
+                }
+
+                if (Pos[k->keys.pos] == 0) {
+                    auto p = u->childs.begin();
+                    while ((*p) != k) p++; 
+                    u->childs.erase(p);
+
+                    std::vector<Transforms2> Ani(Anima.size());
+                    SetPostion();
+                    GetUI(root,Ani);
+                    Anima = Animation.back();
+                    for (Transforms2 & v : Anima) v.u = v.v;  
+                    for (int i = 0 ; i < Ani.size() ; i++){
+                        Anima[i].v.Postion = Ani[i].v.Postion;
+                        Anima[i].v.PostionE = Ani[i].v.PostionE;
+                        Anima[i].v.PostionPar = Ani[i].v.PostionPar;
+                        Anima[i].v.radius = Ani[i].v.radius;
+                    }
+                    Animation.push_back(Anima);
+                }
+
+                if (u->keys.f-- == 1){
+                    for (Transforms2 & v : Anima) v.u = v.v;   
+                    int pos = u->keys.pos;
+                    Anima[pos].v.Af = 0;
+                    Anima[pos].v.PostionE = Anima[pos].v.PostionPar;
+                    Animation.push_back(Anima);
+                    Pos[pos] = 0;
+                    u->keys.pos = -1;
+                    Anima[pos].v.pos = -1;
+
+                }
+                else {
+                    for (Transforms2 & v : Anima) v.u = v.v;   
+                    int pos = u->keys.pos;
+                    Anima[pos].v.color = 0;
+                    Anima[pos].u.Af = 0;
+                    Anima[pos].v.colorE = 0;
+                    Animation.push_back(Anima);
+                }
+
+                return g;
+            }
+
+        }
+
+
+
+        void Delete(std::string x,std::vector <std::vector<Transforms2> >  &Animation) {
+            std::vector<Transforms2> Anima = Animation.back();
+            int d = 0;
+            for (Transforms2 & v : Anima) {
+                v.u = v.v;
+                if (v.v.color != 0) {
+                    v.v.color = 0;
+                    d = 1;
+                }
+                if (v.v.colorE != 0) {
+                    v.v.colorE = 0;
+                    v.u.AE = 0;
+                    d = 1;
+                }
+            }
+
+            std::cout << x << "\n";
+
+            if (d == 1) Animation.push_back(Anima);
+            Del(root,-1,x,Animation);
+        }
     };
 
 
@@ -897,9 +1122,9 @@ private:
 
 public:
     void create(int n);
-    void insert(int v);
-    void search(int v);
-    void Select(int k);
+    void insert(std::string s);
+    void search(std::string v);
+    void DElete(std::string v);
     void loadfile();
     void init();
     void draw();

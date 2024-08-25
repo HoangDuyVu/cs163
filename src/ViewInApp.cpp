@@ -57,7 +57,7 @@ int ViewInApp::UpdatePressOn(bool Press){
         checkNodeSpeed = 1; 
         if (gtt == -1e8)
         gtt = GetMousePosition().x - NodeSpeed.Postion.x;
-        std::cout << gtt << "\n";
+      //  std::cout << gtt << "\n";
     }
 
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -67,25 +67,25 @@ int ViewInApp::UpdatePressOn(bool Press){
 
     if (checkNodeSpeed){
             NodeSpeed.Postion.x = GetMousePosition().x - gtt;
-            std::cout << NodeSpeed.Postion.x << "\n";
+           // std::cout << NodeSpeed.Postion.x << "\n";
             if (NodeSpeed.Postion.x < Speed.Postion.x) 
                 NodeSpeed.Postion.x = Speed.Postion.x;
 
             if (NodeSpeed.Postion.x + NodeSpeed.Size.x > Speed.Postion.x + Speed.Size.x) 
                 NodeSpeed.Postion.x = Speed.Postion.x + Speed.Size.x - NodeSpeed.Size.x;
-            std::cout << NodeSpeed.Postion.x << "\n";
+          //  std::cout << NodeSpeed.Postion.x << "\n";
     }
 
     float total = 237/2.0;
     float Nowpos = NodeSpeed.Postion.x + NodeSpeed.Size.x - Speed.Postion.x;
     if (Nowpos <= total) {
         float x = Nowpos / (total / 10.0);
-        deltaTime = 1.0/(0.1*x);
+        deltaTime = 0.25/(0.1*x);
     }
     else {
         Nowpos -= total;
-        float x = Nowpos / (total /15.0);
-        deltaTime = 1.0/(1.0 + 1.0*x);
+        float x = Nowpos / (total /20.0);
+        deltaTime = 0.25/(1.0 + 1.0*x);
     }
 
     return -1;

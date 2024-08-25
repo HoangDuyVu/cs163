@@ -307,7 +307,7 @@ void Hashtable::draw(){
     Persistent.DrawBasic(1.0f); 
     NodePersistent.DrawBasic(1.0f);
 
-    float Speed = 1.0/deltaTime - 0.1;
+    float Speed = 0.25/deltaTime - 0.1;
     char textBuffer[7];
     snprintf(textBuffer, sizeof(textBuffer), "%.1f", Speed);
     int Iz = strlen(textBuffer);

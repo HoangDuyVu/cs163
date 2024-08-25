@@ -12,7 +12,6 @@
 void Trie::init(){
     tft = TwoTFTree(Limitnode);
     Animation.clear();
-    // AnimationEdge.clear();
     Unre.clear();
     select.init(); 
 
@@ -67,7 +66,9 @@ float Trie::NewPos1D(float x, float y, float g) {
 }
 
 void Trie::DrawAnimation(std::vector<Transforms2> f,double g){
+    int DD = 0;
     for (Transforms2 v : f) {
+        if (v.v.pos != DD++) continue;
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
         Vector2 NewPostionE = NewPos2D(v.u.PostionE,v.v.PostionE,g);
         Vector2 NewPostionPar = NewPos2D(v.u.PostionPar,v.v.PostionPar,g);
@@ -75,27 +76,53 @@ void Trie::DrawAnimation(std::vector<Transforms2> f,double g){
         int NewAE = (int) std::min((float)254.0,NewPos1D(v.u.AE,v.v.AE,g));
         NewA = std::max(NewA,0);
         if (v.v.par != -1){
-            DrawEdge2(NewPostionE,NewPostionPar,0,v.u.colorE,255);
+            DrawEdge(NewPostionE,NewPostionPar,0,v.u.colorE,255);
 
             if (v.u.AE == 0) {
-                DrawEdge2(NewPostionE,NewPostionPar,v.v.val,v.v.colorE,NewAE);
+                DrawEdge(NewPostionE,NewPostionPar,v.v.val,v.v.colorE,NewAE);
             }
             else 
             if (v.v.colorE != v.u.colorE) {
-                NewPostionE = NewPos2D(NewPostionPar,NewPostionE,g);
-             //   std::cout << g << " " << NewPostionE.x << " " << NewPostionE.y << " " << NewPostionPar.x << " " << NewPostionPar.y  << "\n";
-                DrawEdge2(NewPostionE,NewPostionPar,v.v.val,1,255);
+                if (v.v.colorE == 1){
+                    NewPostionE = NewPos2D(NewPostionPar,NewPostionE,g);
+                //   std::cout << g << " " << NewPostionE.x << " " << NewPostionE.y << " " << NewPostionPar.x << " " << NewPostionPar.y  << "\n";
+                    DrawEdge2(NewPostionE,NewPostionPar,v.v.val,v.v.colorE,255);
+                }
+                else {
+                    NewPostionPar = NewPos2D(NewPostionE,NewPostionPar,g);
+                //   std::cout << g << " " << NewPostionE.x << " " << NewPostionE.y << " " << NewPostionPar.x << " " << NewPostionPar.y  << "\n";
+                    DrawEdge2(NewPostionE,NewPostionPar,v.v.val,v.v.colorE,255);
+                }
             }
         }
     }
 
+    DD = 0;
+
     for (Transforms2 v : f) {
+         if (v.v.pos != DD++) continue;
         Vector2 NewPostion = NewPos2D(v.u.Postion,v.v.Postion,g);
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         double Newr = NewPos1D(v.u.radius,v.v.radius,g);
         NewA = std::max(NewA,0);
-        if (v.v.color != v.u.color) DrawVertexL(NewPostion,Newr,v.v.val,v.u.color,255);
-        DrawVertexL(NewPostion,Newr,v.v.val,v.v.color,NewA);
+
+        char Text[6];
+        if (v.v.val == -1) {
+            Text[0] = 'R';
+            Text[1] = 'o';
+            Text[2] = 'o';
+            Text[3] = 't';
+            Text[4] = '\0';
+        } else {
+            Text[0] = v.v.val;
+            Text[1] = '\0';
+            if (v.v.end > 0) {
+                Text[1] = '#';
+                Text[2] = '\0';
+            } 
+        }
+        if (v.v.color != v.u.color) DrawVertexText2(NewPostion,Newr,Text,v.u.color,255);
+        DrawVertexText2(NewPostion,Newr,Text,v.v.color,NewA);
     }
 
 }
@@ -296,7 +323,7 @@ void Trie::draw(){
     Persistent.DrawBasic(1.0f); 
     NodePersistent.DrawBasic(1.0f);
 
-    float Speed = 1.0/deltaTime - 0.1;
+    float Speed = 0.25/deltaTime - 0.1f;
     char textBuffer[7];
     snprintf(textBuffer, sizeof(textBuffer), "%.1f", Speed);
     int Iz = strlen(textBuffer);
@@ -336,30 +363,36 @@ int Trie::Select::checkPressOn(bool Press){
                             v.press = 0;
                             KIND = 0;
 
-                            int n = 0;
+                            std::string x;
+                            x.clear();
                             for (int i = 0 ; _insert.a[i] != '\0' ; i++)
-                                n = n * 10 + _insert.a[i] - '0';
-                            sel_v = n;
+                                x += _insert.a[i];
+                            sel_s = x;
+                            _insert.a[0] = '\0';
                             return 201;
                         }
 
                         if (v.kind == Search && _search.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
                             v.press = 0;
                             KIND = 0;
-                            int n = 0;
+                            std::string x;
+                            x.clear();
                             for (int i = 0 ; _search.a[i] != '\0' ; i++)
-                                n = n * 10 + _search.a[i] - '0';
-                            sel_k = n;
+                                x += _search.a[i];
+                            sel_s = x;
+                            _search.a[0] = '\0';
                             return 202;
                         }
 
                         if (v.kind == Delete && _delete.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
                             v.press = 0;
                             KIND = 0;
-                            int n = 0;
+                            std::string x;
+                            x.clear();
                             for (int i = 0 ; _delete.a[i] != '\0' ; i++)
-                                n = n * 10 + _delete.a[i] - '0';
-                            sel_k = n;
+                                x += _delete.a[i];
+                            sel_s = x;
+                            _delete.a[0] = '\0';
                             return 203;
                         }
                         if (v.kind == Update && _update.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
@@ -413,13 +446,13 @@ void Trie::Activity(){
         create(sel_n);
     }
     else if (g == 201) {
-        insert(sel_v);
+        insert(sel_s);
     }
     else if (g == 202) {
-        search(sel_k);
+        search(sel_s);
     }
     else if (g == 203) {
-        Select(sel_k);
+        DElete(sel_s);
     }
     else if (g == 205){
         loadfile();
@@ -454,7 +487,7 @@ void Trie::loadfile() {
     fin >> n;
     n = std::min(n,50);
     for (int i = 0 ; i < n ; i++) {
-        int x;
+        std::string x;
         fin >> x;
         tft.insert(x,Animation);
     }
@@ -505,7 +538,11 @@ void Trie::create(int n){
     tft.GetUI(tft.root,Anima);
     Animation.push_back(Anima);
     for (int i = 0 ; i < n ; i++) {
-        int x = rng() % 100;
+        std::string x;
+        x.clear();
+        int n = rng() % 6 + 1;
+
+        for (int j = 0 ; j < n ; j++)x += rng() % 26 + 'a';
         tft.insert(x,Animation);
     }
 
@@ -546,14 +583,43 @@ void Trie::create(int n){
 }
 
 
-void Trie::insert(int v){
+void Trie::insert(std::string s){
 
+    //std::cout << s << "\n";
     Animation.clear();
     std::vector<Transforms2> Anima(tft.Pos.size());
     tft.SetPostion();
     tft.GetUI(tft.root,Anima);
     Animation.push_back(Anima);
-    tft.insert(v,Animation);
+    tft.insert(s,Animation);
+    Animation.erase(Animation.begin());
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        UnreAVL.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+
+    TwoTFTree tft2 = tft;
+    tft2.root = tft2.Save(tft2.root);
+    UnreAVL.push_back(tft2);
+ }
+
+ void Trie::search(std::string v){
+    std::cout << "coooo " << v << "\n";
+    Animation.clear();
+    std::vector<Transforms2> Anima(tft.Pos.size());
+    tft.SetPostion();
+    tft.GetUI(tft.root,Anima);
+    Animation.push_back(Anima);
+    tft.search(v,Animation);
     Animation.erase(Animation.begin());
     pause = 0;
     pos_ani = 0;
@@ -574,14 +640,14 @@ void Trie::insert(int v){
     UnreAVL.push_back(tft2);
 }
 
-void Trie::search(int v){
-
+void Trie::DElete(std::string v){
+    std::cout << "coooo " << v << "\n";
     Animation.clear();
     std::vector<Transforms2> Anima(tft.Pos.size());
     tft.SetPostion();
     tft.GetUI(tft.root,Anima);
     Animation.push_back(Anima);
-    tft.search(v,tft.root,Animation);
+    tft.Delete(v,Animation);
     Animation.erase(Animation.begin());
     pause = 0;
     pos_ani = 0;
@@ -602,29 +668,6 @@ void Trie::search(int v){
     UnreAVL.push_back(tft2);
 }
 
-void Trie::Select(int k){
-
-  //  if (k > avl.GetSize()) return ;
-    Animation.clear();
-    // AnimationEdge.clear();
-
-
- //   avl.select(avl.root,-1,0,k,Animation,// AnimationEdge);
-    pause = 0;
-    pos_ani = 0;
-    LastTime = GetTime();
-    TotalTime = 0;
-
-    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
-        Unre.pop_back();
-        UnreAVL.pop_back();
-    }
-
-    Pos_unre++;
-
-    Unre.push_back(Animation);
-    UnreAVL.push_back(tft);
-}
 
 
 void Trie::Notification(){

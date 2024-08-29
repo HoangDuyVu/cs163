@@ -85,6 +85,7 @@ void Graph2::DrawAnimation(std::vector<Transforms2> f,std::vector<Transformse> k
         }
 
         if (v.v.color == 0) v.v.color = 10;
+        if (v.v.color == 1) v.v.color = 11;
         DrawVertex(tft.adj[v.u.x][v.u.y].PosMid,13,v.v.val,v.v.color + 100,NewA);
     }
 
@@ -372,15 +373,9 @@ int Graph2::Select::checkPressOn(bool Press){
                             return 202;
                         }
 
-                        if (v.kind == Delete && _delete.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
+                        if (v.kind == Delete && _delete.Item[0].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
                             v.press = 0;
                             KIND = 0;
-                            std::string x;
-                            x.clear();
-                            for (int i = 0 ; _delete.a[i] != '\0' ; i++)
-                                x += _delete.a[i];
-                            sel_s = x;
-                            _delete.a[0] = '\0';
                             return 203;
                         }
                         if (v.kind == Update && _update.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
@@ -441,7 +436,7 @@ void Graph2::Activity(){
         CC();
     }
     else if (g == 203) {
-        DElete(sel_s);
+        MST();
     }
     else if (g == 204) {
         update();
@@ -614,6 +609,44 @@ void Graph2::CC(){
     UnreAVL.push_back(tft2);
 }
 
+void Graph2::MST(){
+    if (sel_n == 0) return ;
+
+    Animation.clear();
+    Animatione.clear();
+
+    std::vector<Transforms2> Ani(42);
+    std::vector<Transformse> AniE(1600);
+
+    for (int i = 0 ; i < tft.capacity ; i++) tft.node[i].con = 0;
+    tft.GetUI(Ani,AniE);
+    for (Transforms2 &v : Ani) {
+        v.v.color = 0;
+        v.u.Af = 0;
+    }
+    Animation.push_back(Ani);
+    Animatione.push_back(AniE);
+
+    tft.MST(Animation,Animatione);
+
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        Unree.pop_back();
+        UnreAVL.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    Unree.push_back(Animatione);
+    TwoTFTree tft2 = tft;
+    UnreAVL.push_back(tft2);
+}
 
 void Graph2::insert(std::string s){
     Animation.clear();

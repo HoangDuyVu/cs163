@@ -294,16 +294,16 @@ private:
             Rectangle Rect;
             Pointer Pointer_A;
             std::vector <button_select> Item;
-            char a[10];
+            char a[8];
             void init(Vector2 _postion){
                 Postion = _postion;
-                Item.resize(3);
-                Rect = {184,Postion.y,200 + 70,40};
-                Pointer_A.init({239 + 35,506},{3,16});
+                Item.resize(1);
+                Rect = {184,Postion.y, 62,40};
+                Pointer_A.init({239 + 35,546},{3,16});
                 a[0] = '\0';
-                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
-                Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
-                Item[2] = button_select({331 + 70,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
+               // Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
+                //Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
+                Item[0] = button_select({194,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
 
                 for (button_select &v : Item) {
                     v.image.height /=4;
@@ -323,45 +323,6 @@ private:
                     v.DrawBasic(0.8f);
                 }
 
-                if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-
-                    int n = rng() % 6 + 1;
-
-                    for (int i = 0 ; i < n ; i++) a[i] = rng() % 26 + 'a';
-                    a[n] = '\0';
-
-                }
-
-                int key = GetCharPressed();
-                while (key > 0) {
-                    if ((((key >= 48) && (key <= 57)) || (key >= 'a' && key <= 'z')) && strlen(a) < 6) {
-                        int len = strlen(a);
-                        a[len] = (char) key;
-                        a[len + 1] = '\0';
-                    }
-
-                    key = GetCharPressed();
-                }
-
-                if (IsKeyPressed(KEY_BACKSPACE))
-                {
-                    int len = strlen(a);
-                    if (len > 0) a[len - 1] = '\0';
-                }
-
-                Rectangle Rec = {231,Postion.y + 5,42,29};
-                int fontSize = 25;
-
-                Vector2 textSize = MeasureTextEx(customFont, a, fontSize, 1);
-
-                Vector2 textPosition = {
-                    247,
-                    Rec.y + (Rec.height - textSize.y) / 2
-                };
-
-                DrawTextEx(customFont, a, textPosition, fontSize, 1, WHITE);
-                Pointer_A.Postion = {textPosition.x + textSize.x + 3,textPosition.y + 4};
-                Pointer_A.DrawPointer();
             }
 
         };
@@ -762,6 +723,7 @@ private:
         Vector2 poscheck;
         std::vector <key> node;
         std::vector <std::vector<egdeee> > adj;
+        std::vector <int> to;
         int Check;
 
         TwoTFTree(int cap = 0) {
@@ -837,7 +799,7 @@ private:
                     key Cen;
                     Cen.Postion = {(float)screenWidth/2,(float)screenHeight/2};
                     Vector2 K = toVec(node[i],Cen);
-                    K.x *= 0.04f;
+                    K.x *= 0.02f;
                     K.y *= 0.04f;
                     node[i].TotalF.x += K.x;
                     node[i].TotalF.y += K.y;
@@ -1010,6 +972,82 @@ private:
             }
         }
 
+        int trace(int u) {
+            if (to[u] != u) return to[u] = trace(to[u]);
+            return u;
+        }
+
+        bool join(int x,int y){
+            x = trace(x);
+            y = trace(y);
+            if (x == y) return false;
+            to[x] = y;
+            return true;
+        }
+
+        void MST(std::vector <std::vector<Transforms2> >  &Animation,std::vector <std::vector<Transformse> >  &AnimationE) {
+            int d = 0;
+            std::vector<Transforms2> Ani = Animation.back();
+            std::vector<Transformse> AniE = AnimationE.back();
+            std::vector <std::pair<int,int> > b;
+            b.clear();
+            to.resize(capacity + 1);
+
+            for (int i = 1 ; i < capacity ; i++)
+                for (int j = 1 ; j < capacity ; j++)
+                if (adj[i][j].print && i != j && node[i].f && node[j].f && adj[i][j].f) {
+                    b.push_back(std::make_pair(i,j));
+                } 
+            
+            for (int i = 1 ; i < capacity ; i++) to[i] = i;
+
+            std::sort(b.begin(),b.end(),[&](std::pair<int,int> x, std::pair<int,int> y){
+                return adj[x.first][x.second].val <  adj[y.first][y.second].val;
+            });
+
+          //  std::cout << b.size() << "\n";
+
+            for (std::pair<int,int> v : b) {
+                int x = v.first;
+                int y = v.second;
+                for (Transforms2 &v : Ani) v.u = v.v;
+                for (Transformse &v : AniE) v.u = v.v;
+                Ani[x].v.color = 12;
+                Ani[y].v.color = 12;
+                Ani[x].u.Af = 0;
+                Ani[y].u.Af = 0;
+                AniE[adj[x][y].pos].v.color = 12;
+                AniE[adj[x][y].pos].v.Ani = 1;
+                Animation.push_back(Ani);
+                AnimationE.push_back(AniE);
+                if (join(x,y)) {
+                    for (Transforms2 &v : Ani) v.u = v.v;
+                    for (Transformse &v : AniE) v.u = v.v;
+                    Ani[x].v.color = 2;
+                    Ani[y].v.color = 2;
+                    Ani[x].u.Af = 0;
+                    Ani[y].u.Af = 0;
+                    AniE[adj[x][y].pos].v.color = 1;
+                    AniE[adj[x][y].pos].v.Ani = 0;
+                    Animation.push_back(Ani);
+                    AnimationE.push_back(AniE);
+                }
+                else {
+                    for (Transforms2 &v : Ani) v.u = v.v;
+                    for (Transformse &v : AniE) v.u = v.v;
+                    Ani[x].v.color = 2;
+                    Ani[y].v.color = 2;
+                    Ani[x].u.Af = 0;
+                    Ani[y].u.Af = 0;
+                    AniE[adj[x][y].pos].v.Af = 0;
+                    AniE[adj[x][y].pos].u.Ani = 0;
+                    AniE[adj[x][y].pos].v.Ani = 0;
+                    Animation.push_back(Ani);
+                    AnimationE.push_back(AniE);        
+                }
+            }
+        }
+
 
 
         void insert(std::string x,std::vector <std::vector<Transforms2> >  &Animation) {
@@ -1052,6 +1090,7 @@ public:
     void search(std::string v);
     void DElete(std::string v);
     void CC();
+    void MST();
     void update();
     void loadfile();
     void init();

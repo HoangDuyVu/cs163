@@ -329,7 +329,7 @@ private:
                 }
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-                    int n = rng() % (LimitNode) + 1;
+                    int n = rng() % (100);
                     if (n == -1) n = 0;
 
                     a[0] = n / 10 + '0';
@@ -354,7 +354,7 @@ private:
                     for (int i = 0 ; i < strlen(a); i++) n = n*10 + a[i] - '0';
 
                     if (n > LimitNode) {
-                        n = std::max(0,LimitNode);
+                        n = std::max(0,99);
                         if (n < 9) {
                             a[0] = n + '0';
                             a[1] = '\0';
@@ -675,7 +675,7 @@ private:
             sel[0] = choose(Create, Vector2 {27,536},Vector2 {150,40},"Create",ConstColor1,ConstColor2,0);
             sel[1] = choose(Insert, Vector2 {27,576},Vector2 {150,40},"Insert",ConstColor1,ConstColor2,0);
             sel[2] = choose(Search, Vector2 {27,616},Vector2 {150,40},"Search",ConstColor1,ConstColor2,0);
-            sel[3] = choose(Delete, Vector2 {27,656},Vector2 {150,40},"Select",ConstColor1,ConstColor2,0);
+            sel[3] = choose(Delete, Vector2 {27,656},Vector2 {150,40},"Delete",ConstColor1,ConstColor2,0);
             sel[4] = choose(file, Vector2 {27,496},Vector2 {150,40},"File",ConstColor1,ConstColor2,0);
         }
 

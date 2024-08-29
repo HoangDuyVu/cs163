@@ -17,6 +17,7 @@ extern bool Loadfile;
 extern Font customFont;
 extern double deltaTime;
 
+extern Color Col[7];
 extern  int sel_n;
 extern  int sel_v;
 extern  int sel_k;

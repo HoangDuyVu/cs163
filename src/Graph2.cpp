@@ -13,6 +13,7 @@ void Graph2::init(){
     tft = TwoTFTree(40);
     Animation.clear();
     Unre.clear();
+    Unree.clear();
     select.init(); 
 
     Persistent = button_select({455,761},{582,23},0,LoadTexture("res/textures/in_app/tua.png"),RAYWHITE);
@@ -69,16 +70,30 @@ void Graph2::DrawAnimation(std::vector<Transforms2> f,std::vector<Transformse> k
     if (sel_check == 0) tft.SetPostion();
 
     for (Transformse v : k) if (v.u.f) {
+
+        if (!v.u.print) continue;
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         NewA = std::max(NewA,0);
         int x = v.u.x;
         int y = v.u.y;
-        DrawEdge(tft.node[x].Postion,tft.node[y].Postion,0,v.v.color,NewA);
+        if (NewA == 0) continue;
+
+        DrawEdge(tft.node[x].Postion,tft.node[y].Postion,0,v.u.color,NewA);
+        if (v.v.Ani == 1 && v.u.Ani != 1) {
+            Vector2 NewPostion = NewPos2D(tft.node[x].Postion,tft.node[y].Postion,g);
+            DrawEdge(tft.node[x].Postion,NewPostion,0,v.v.color,NewA);
+        }
+
+        if (v.v.color == 0) v.v.color = 10;
+        DrawVertex(tft.adj[v.u.x][v.u.y].PosMid,13,v.v.val,v.v.color + 100,NewA);
     }
+
+
     for (Transforms2 v : f) if (v.u.f){
         int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
         NewA = std::max(NewA,0);
     //    std::cout << v.u.pos << " " << NewA << " " << tft.node[v.v.pos].Postion.x << " " << tft.node[v.v.pos].Postion.y << "\n";
+        if (v.v.color != v.u.color && NewA < 200)  DrawVertex(tft.node[v.v.pos].Postion,17,tft.node[v.v.pos].val,v.u.color,255);
         DrawVertex(tft.node[v.v.pos].Postion,17,tft.node[v.v.pos].val,v.v.color,NewA);
     }
 
@@ -191,6 +206,7 @@ void Graph2::SolveRemote(){
                 }
                 else {
                     Animation = Unre[Pos_unre];
+                    Animatione = Unree[Pos_unre];
                     tft = UnreAVL[Pos_unre];
                     pause = 1;
                     pos_ani = Animation.size() - 1;
@@ -203,6 +219,7 @@ void Graph2::SolveRemote(){
             if (Pos_unre + 1 < Unre.size()){
                 Pos_unre++;
                 Animation = Unre[Pos_unre];
+                Animatione = Unree[Pos_unre];
                 tft = UnreAVL[Pos_unre];
                 pause = 1;
                 pos_ani = Animation.size() - 1;
@@ -349,15 +366,9 @@ int Graph2::Select::checkPressOn(bool Press){
                             return 300;
                         }
 
-                        if (v.kind == Search && _search.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
+                        if (v.kind == Search && _search.Item[0].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
                             v.press = 0;
                             KIND = 0;
-                            std::string x;
-                            x.clear();
-                            for (int i = 0 ; _search.a[i] != '\0' ; i++)
-                                x += _search.a[i];
-                            sel_s = x;
-                            _search.a[0] = '\0';
                             return 202;
                         }
 
@@ -427,7 +438,7 @@ void Graph2::Activity(){
         insert(sel_s);
     }
     else if (g == 202) {
-        search(sel_s);
+        CC();
     }
     else if (g == 203) {
         DElete(sel_s);
@@ -468,10 +479,12 @@ void Graph2::create(int n){
 
 
     for (int i = 1 ; i <= sel_n ; i++)
-        for (int j = 1 ; j <= sel_n ; j++) {
+        for (int j = i + 1 ; j <= sel_n ; j++) {
             if (adj[i][j] > 0) {
               //  std::cout << i << " " << j << " " <<  adj[i][j] << "\n";
-                tft.adj[i][j] = Graph2::egdeee(i,j);
+                tft.adj[i][j] = Graph2::egdeee(i,j,adj[i][j]);
+                tft.adj[j][i] = Graph2::egdeee(j,i,adj[i][j]);
+                tft.adj[j][i].print = 0;
             }
             else tft.adj[i][j].f = 0;
         }
@@ -496,12 +509,14 @@ void Graph2::create(int n){
 
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
+        Unree.pop_back();
         UnreAVL.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
+    Unree.push_back(Animatione);
     TwoTFTree tft2 = tft;
     UnreAVL.push_back(tft2);
 }
@@ -523,11 +538,14 @@ void Graph2::update(){
                 y = rng() % sel_n + 1;
         }
 
-        tft.adj[x][y] =  Graph2::egdeee(x,y);
+        int tt = rng() % 100;
+        tft.adj[x][y] =  Graph2::egdeee(x,y,tt);
+        tft.adj[y][x] =  Graph2::egdeee(y,x,tt);
+        tft.adj[y][x].print = 0;
     }
    // exit(0);
 
-    std::cout << tft.node.size() << "\n";
+  //  std::cout << tft.node.size() << "\n";
 
     Animation.clear();
     Animatione.clear();
@@ -538,6 +556,44 @@ void Graph2::update(){
     tft.GetUI(Ani,AniE);
     Animation.push_back(Ani);
     Animatione.push_back(AniE);
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        Unree.pop_back();
+        UnreAVL.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    Unree.push_back(Animatione);
+    TwoTFTree tft2 = tft;
+    UnreAVL.push_back(tft2);
+}
+
+void Graph2::CC(){
+    if (sel_n == 0) return ;
+
+    Animation.clear();
+    Animatione.clear();
+
+    std::vector<Transforms2> Ani(42);
+    std::vector<Transformse> AniE(1600);
+
+    for (int i = 0 ; i < tft.capacity ; i++) tft.node[i].con = 0;
+    tft.GetUI(Ani,AniE);
+    for (Transforms2 &v : Ani) {
+        v.v.color = 0;
+        v.u.Af = 0;
+    }
+    Animation.push_back(Ani);
+    Animatione.push_back(AniE);
+
+    tft.CC(Animation,Animatione);
 
     pause = 0;
     pos_ani = 0;
@@ -546,12 +602,14 @@ void Graph2::update(){
 
     while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
         Unre.pop_back();
+        Unree.pop_back();
         UnreAVL.pop_back();
     }
 
     Pos_unre++;
 
     Unre.push_back(Animation);
+    Unree.push_back(Animatione);
     TwoTFTree tft2 = tft;
     UnreAVL.push_back(tft2);
 }

@@ -12,6 +12,7 @@ int sel_v;
 int sel_k;
 int sel_i;
 int sel_check;
+Color Col[7] = {{91,91,174,255},{255,143,183,255},{12,192,233,255},{0,191,99,255},{255,198,89,255},{255,87,87,255}};
 std::string sel_s;
 std::vector<std::vector<int> > adj;
 Texture2D L1,L2,L3;
@@ -99,7 +100,18 @@ void DrawVertex(Vector2 Postion,float radius,int val, int kind_color,unsigned ch
     }
     else if (kind_color == 4){
         DrawTextEx(customFont, text, textPosition, fontSize, 0,{107,100,184,a});
+    }    else if (kind_color > 10 && kind_color < 100) {
+        kind_color -= 10;
+        kind_color %= 6;
+        DrawCircle(Postion.x,Postion.y, radius*6/5.0,Fade(Col[kind_color],((float)a/255.0)));
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(WHITE,1.0*a/255.0));
     }
+    else if (kind_color >=110){
+        kind_color -= 110;
+        kind_color %= 6;
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(Col[kind_color],((float)a/255.0)));
+    }
+    
 }
 
 void DrawVertexText2(Vector2 Postion,float radius,char* text, int kind_color,unsigned char a) {
@@ -133,6 +145,12 @@ void DrawVertexText2(Vector2 Postion,float radius,char* text, int kind_color,uns
     }
     else if (kind_color == 4){
         DrawTextEx(customFont, text, textPosition, fontSize, 0,{107,100,184,a});
+    } 
+    else if (kind_color > 10) {
+        kind_color -= 10;
+        kind_color %= 6;
+        DrawCircle(Postion.x,Postion.y, radius*6/5.0,Fade(Col[kind_color],((float)a/255.0)));
+        DrawTextEx(customFont, text, textPosition, fontSize, 0,Fade(WHITE,1.0*a/255.0));
     }
 }
 
@@ -150,6 +168,11 @@ void DrawVertexText(Vector2 Postion,float radius,char *text, int fontSize,unsign
 void DrawEdge(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a) {
     if (kind_color == 0) DrawLineEx(PostionX,PostionY,4.0f,{107,100,184,a});
     else if (kind_color == 1) DrawLineEx(PostionX,PostionY,4.0f,ConstColor2);
+    else if (kind_color > 10) {
+        kind_color -= 10;
+        kind_color %= 6;
+        DrawLineEx(PostionX,PostionY,4.0f,Fade(Col[kind_color],((float)a/255.0)));
+    }
 }
 
 void DrawEdge2(Vector2 PostionX,Vector2 PostionY,int val, int kind_color,unsigned char a) {

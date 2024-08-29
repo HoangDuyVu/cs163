@@ -259,13 +259,13 @@ private:
             char a[8];
             void init(Vector2 _postion){
                 Postion = _postion;
-                Item.resize(3);
-                Rect = {184,Postion.y,200 + 70,40};
+                Item.resize(1);
+                Rect = {184,Postion.y, 62,40};
                 Pointer_A.init({239 + 35,506},{3,16});
                 a[0] = '\0';
-                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
-                Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
-                Item[2] = button_select({331 + 70,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
+               // Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
+                //Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
+                Item[0] = button_select({194,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
 
                 for (button_select &v : Item) {
                     v.image.height /=4;
@@ -285,45 +285,6 @@ private:
                     v.DrawBasic(0.8f);
                 }
 
-                if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-
-                    int n = rng() % 6 + 1;
-
-                    for (int i = 0 ; i < n ; i++) a[i] = rng() % 26 + 'a';
-                    a[n] = '\0';
-
-                }
-
-                int key = GetCharPressed();
-                while (key > 0) {
-                    if ((((key >= 48) && (key <= 57)) || (key >= 'a' && key <= 'z')) && strlen(a) < 6) {
-                        int len = strlen(a);
-                        a[len] = (char) key;
-                        a[len + 1] = '\0';
-                    }
-
-                    key = GetCharPressed();
-                }
-
-                if (IsKeyPressed(KEY_BACKSPACE))
-                {
-                    int len = strlen(a);
-                    if (len > 0) a[len - 1] = '\0';
-                }
-
-                Rectangle Rec = {231,Postion.y + 5,42,29};
-                int fontSize = 25;
-
-                Vector2 textSize = MeasureTextEx(customFont, a, fontSize, 1);
-
-                Vector2 textPosition = {
-                    247,
-                    Rec.y + (Rec.height - textSize.y) / 2
-                };
-
-                DrawTextEx(customFont, a, textPosition, fontSize, 1, WHITE);
-                Pointer_A.Postion = {textPosition.x + textSize.x + 3,textPosition.y + 4};
-                Pointer_A.DrawPointer();
             }
 
         };
@@ -735,6 +696,7 @@ private:
         int val;
         int f;
         int pos;
+        int con;
         Vector2 TotalF;
 
         key(int _val = 0) {
@@ -742,13 +704,14 @@ private:
             val = _val;
             f = 0;
             color = 1;
+            con = 0;
             if (val > 0) f = 1;
             TotalF = {0,0};
         }
     };
 
     struct egdeee {
-        Vector2 PosX,PosY;
+        Vector2 PosX,PosY,PosMid;
         int Af; 
         int Ani;
         int color;
@@ -756,6 +719,7 @@ private:
         int pos;
         int f;
         int x , y;
+        int print;
         egdeee() {
             Af = 0;
             val = 0;
@@ -763,15 +727,18 @@ private:
             f = 0;
             int x = 0;
             int y = 0;
+            int print = 0;
         }
-        egdeee(int _x,int _y) {
+        egdeee(int _x,int _y,int _val) {
             Af = 255;
-            val = 0;
+            val = _val;
             Ani = 0;
             color = 0;
             f = 1;
             x = _x;
             y = _y;
+            print = 1;
+            
         }
     };
 
@@ -927,6 +894,27 @@ private:
                 node[i].Postion.x += node[i].TotalF.x;
                 node[i].Postion.y += node[i].TotalF.y;
             }
+
+            for (int i = 1 ; i < capacity ; i++)
+                for (int j = 1 ; j < capacity ; j++) if (i!= j && node[i].f && node[j].f && adj[i][j].f){
+
+                    int dd = 0;
+                    if (i > j){
+                        std::swap(i,j);
+                        dd = 1;
+                    }
+                    Vector2 A = Nomal(node[i],node[j]);
+                    std::swap(A.x,A.y);
+                    A.x *= -1;
+                    Vector2 mid;
+                    mid.x = (node[i].Postion.x + node[j].Postion.x)/2.0;
+                    mid.y = (node[i].Postion.y + node[j].Postion.y)/2.0;
+
+                    mid.x += A.x*12;
+                    mid.y += A.y*12;
+                    if (dd == 1) std::swap(i,j);
+                    adj[i][j].PosMid = mid;
+                }
         }
 
         void Botton() {
@@ -971,6 +959,57 @@ private:
                 }
         }
 
+        void DFS(int u,int d,std::vector <std::vector<Transforms2> >  &Animation,std::vector <std::vector<Transformse> >  &AnimationE) {
+            std::vector<Transforms2> Ani = Animation.back();
+            std::vector<Transformse> AniE = AnimationE.back();
+            for (Transforms2 &v : Ani) v.u = v.v;
+            for (Transformse &v : AniE) v.u = v.v;
+
+          //  std::cout << u << " " << d << "\n";
+
+            node[u].con = d;
+            Ani[u].v.color = d + 10;
+            Ani[u].u.Af = 0;
+            Animation.push_back(Ani);
+            AnimationE.push_back(AniE);
+
+            for (int i = 1 ; i < capacity ; i++) 
+            if (node[i].f && (adj[u][i].f || adj[i][u].f)) {
+                int pos = adj[u][i].pos;
+                int pos2 = adj[i][u].pos;
+
+                Ani = Animation.back();
+                AniE = AnimationE.back();
+                if (AniE[pos].v.Af == 0 || AniE[pos2].v.Af == 0 || AniE[pos2].v.Ani != 0 || AniE[pos].v.Ani != 0) continue;
+                for (Transforms2 &v : Ani) v.u = v.v;
+                for (Transformse &v : AniE) v.u = v.v;
+                AniE[pos].v.color = d + 10;
+                AniE[pos].v.Ani = 1;
+                AniE[pos].v.print = 1;
+                AniE[pos].u.print = 1;
+                AniE[pos2].u.Af = 0;
+                AniE[pos2].v.Af = 0;
+                Animation.push_back(Ani);
+                AnimationE.push_back(AniE);
+                if (node[i].con == 0)
+                DFS(i,d,Animation,AnimationE);
+            }
+        }
+
+        void CC(std::vector <std::vector<Transforms2> >  &Animation,std::vector <std::vector<Transformse> >  &AnimationE) {
+            int d = 0;
+            std::vector<Transforms2> Ani = Animation.back();
+            std::vector<Transformse> AniE = AnimationE.back();
+            for (Transforms2 &v : Ani) v.u = v.v;
+            for (Transformse &v : AniE) v.u = v.v;
+            for (int i = 1 ; i < capacity ; i++) {
+                if (!node[i].con && node[i].f) {
+                    d++;
+                    DFS(i,d,Animation,AnimationE);
+                }
+            }
+        }
+
 
 
         void insert(std::string x,std::vector <std::vector<Transforms2> >  &Animation) {
@@ -1012,6 +1051,7 @@ public:
     void insert(std::string s);
     void search(std::string v);
     void DElete(std::string v);
+    void CC();
     void update();
     void loadfile();
     void init();

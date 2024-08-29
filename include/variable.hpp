@@ -21,10 +21,11 @@ extern  int sel_n;
 extern  int sel_v;
 extern  int sel_k;
 extern  int sel_i;
+extern  int sel_check;
 extern  std::string sel_s;
 extern  int LimitNode;
 extern char pathfile[40];
-
+extern std::vector<std::vector<int> > adj;
 
 extern Texture2D Logo;
 

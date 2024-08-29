@@ -11,7 +11,9 @@ int sel_n;
 int sel_v;
 int sel_k;
 int sel_i;
+int sel_check;
 std::string sel_s;
+std::vector<std::vector<int> > adj;
 Texture2D L1,L2,L3;
 int LimitNode;
 char pathfile[40];
@@ -59,7 +61,7 @@ bool button_select::CheckPress(Vector2 A,int k,bool _press){
    
 void button_select::DrawBasic(float g){
     float k = 1;
-    if (col) k = g;
+    if (col && kind_mouse != 5) k = g;
     DrawTexture(image,Postion.x,Postion.y,Fade(color,k));
 }
 

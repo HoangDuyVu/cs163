@@ -1,6 +1,6 @@
 #include <iostream>
 #include <raylib.h>
-#include <Graph.hpp>
+#include <Graph2.hpp>
 #include <variable.hpp>
 #include <ViewInApp.hpp>
 #include <activities.hpp>
@@ -9,8 +9,8 @@
 #include <fstream>
 
 
-void Graph::init(){
-    tft = TwoTFTree(Limitnode);
+void Graph2::init(){
+    tft = TwoTFTree(40);
     Animation.clear();
     Unre.clear();
     select.init(); 
@@ -45,7 +45,7 @@ void Graph::init(){
     sel_i = 0;
 }
 
-int Graph::UpdatePressOn(){
+int Graph2::UpdatePressOn(){
     bool Press = 0;
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) Press = 1;
     int res = viewapp.UpdatePressOn(Press);
@@ -57,19 +57,38 @@ int Graph::UpdatePressOn(){
     return -1;
 }
 
-Vector2 Graph::NewPos2D(Vector2 A,Vector2 B,float g) {
+Vector2 Graph2::NewPos2D(Vector2 A,Vector2 B,float g) {
     return {A.x + (B.x - A.x)*g,A.y + (B.y - A.y)*g};
 }
 
-float Graph::NewPos1D(float x, float y, float g) {
+float Graph2::NewPos1D(float x, float y, float g) {
     return x + (y - x)*g;
 }
 
-void Graph::DrawAnimation(std::vector<Transforms2> f,double g){
+void Graph2::DrawAnimation(std::vector<Transforms2> f,std::vector<Transformse> k,double g){
+    if (sel_check == 0) tft.SetPostion();
+
+    for (Transformse v : k) if (v.u.f) {
+        int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
+        NewA = std::max(NewA,0);
+        int x = v.u.x;
+        int y = v.u.y;
+        DrawEdge(tft.node[x].Postion,tft.node[y].Postion,0,v.v.color,NewA);
+    }
+    for (Transforms2 v : f) if (v.u.f){
+        int NewA = (int) std::min((float)254.0,NewPos1D(v.u.Af,v.v.Af,g));
+        NewA = std::max(NewA,0);
+    //    std::cout << v.u.pos << " " << NewA << " " << tft.node[v.v.pos].Postion.x << " " << tft.node[v.v.pos].Postion.y << "\n";
+        DrawVertex(tft.node[v.v.pos].Postion,17,tft.node[v.v.pos].val,v.v.color,NewA);
+    }
+
+     //           exit(0);
+
+ //   for ()
 
 }
 
-void Graph::UpdatePostionNodePer(){
+void Graph2::UpdatePostionNodePer(){
 
     if (NodePersistent.CheckMouse(GetMousePosition(),1) && IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
         checkNodePer = 1; 
@@ -105,7 +124,7 @@ void Graph::UpdatePostionNodePer(){
 
 }
 
-void Graph::SolveRemote(){
+void Graph2::SolveRemote(){
 
     if (pause == 0) {
         button_select &v = remote[4];
@@ -208,7 +227,7 @@ void Graph::SolveRemote(){
     if (pause == 2)  remote[6].DrawBasic(0.6);
 }
 
-void Graph::draw(){
+void Graph2::draw(){
     SolveRemote();
     Vector2 Mouse = GetMousePosition();
     UpdatePostionNodePer();
@@ -251,7 +270,7 @@ void Graph::draw(){
 
         double G = std::min((double)1.0,(double)TotalTime/deltaTime);
  
-        DrawAnimation(Animation[pos_ani],G);
+        DrawAnimation(Animation[pos_ani],Animatione[pos_ani],G);
 
         float TotalPer = Persistent.Size.x - NodePersistent.Size.x;
         float deltaPer = TotalPer/Animation.size();
@@ -277,7 +296,7 @@ void Graph::draw(){
     select.draw();
 }
 
-int Graph::Select::checkPressOn(bool Press){
+int Graph2::Select::checkPressOn(bool Press){
             if (Press && CheckMouse(GetMousePosition(),1)) return 0;
             int d = 1;
 
@@ -304,7 +323,11 @@ int Graph::Select::checkPressOn(bool Press){
                                 _create.a[i][strlen(_create.a[i])] = ' ';
                                 for (int j = 0 ; _create.a[i][j] != '\0' ; j++) {
                                     if (j != 0 && _create.a[i][j] == ' ' &&  _create.a[i][j - 1] != ' '){
-                                        if (d <= n)  adj[d][m] = val; 
+                                        if (d <= n){
+                                            adj[d][m] = val; 
+
+                                          // std::cout << "d and m :" << d << " " << m << " " << adj[d][m] << "\n";
+                                        }
                                         m++;
                                         if (m > n) {
                                             m = 1;
@@ -322,14 +345,8 @@ int Graph::Select::checkPressOn(bool Press){
                         if (v.kind == Insert && _insert.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
                             v.press = 0;
                             KIND = 0;
-
-                            std::string x;
-                            x.clear();
-                            for (int i = 0 ; _insert.a[i] != '\0' ; i++)
-                                x += _insert.a[i];
-                            sel_s = x;
-                            _insert.a[0] = '\0';
-                            return 201;
+                            sel_check = _insert.check;
+                            return 300;
                         }
 
                         if (v.kind == Search && _search.Item[2].CheckPress(GetMousePosition(),1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
@@ -361,7 +378,7 @@ int Graph::Select::checkPressOn(bool Press){
                             int n = 0;
                             for (int i = 0 ; _update.a[i] != '\0' ; i++)
                                 n = n * 10 + _update.a[i] - '0';
-                            sel_i = n;
+                            sel_n = n;
 
                             n = 0;
                             for (int i = 0 ; _update.b[i] != '\0' ; i++)
@@ -382,9 +399,10 @@ int Graph::Select::checkPressOn(bool Press){
             return -1;
         }
 
-void Graph::Activity(){
+void Graph2::Activity(){
 
  //   LimitNode = avl.GetSize();
+    tft.Botton();
     int g = UpdatePressOn();
     if (g == 101 || g == 102) {
         pos = MENU;
@@ -414,30 +432,112 @@ void Graph::Activity(){
     else if (g == 203) {
         DElete(sel_s);
     }
+    else if (g == 204) {
+        update();
+    }
     else if (g == 205){
         loadfile();
     }
     
 
-    if (g >= 1 && g <= 5) {
+    if (g >= 1 && g <= 6) {
         SelectPress(g - 1);
     }
 
    // if (g != -1) std::cout << g << "\n";
 }
 
-void Graph::SelectPress(int pos) {
+void Graph2::SelectPress(int pos) {
     select.sel[pos].press ^= 1;
     if (select.sel[pos].press)
-    for (int i = 0 ; i < 5 ; i++)
+    for (int i = 0 ; i < 6 ; i++)
         if (i != pos) select.sel[i].press = 0;
 }
 
-void Graph::loadfile() {
+void Graph2::loadfile() {
 }
 
-void Graph::create(int n){
-    tft = TwoTFTree(LimitNode + 30);
+void Graph2::create(int n){
+    tft = TwoTFTree(40);
+
+    for (int i = 1 ; i <= sel_n ; i++) {
+        tft.node[i] = Graph2::key(i);
+        tft.node[i].Postion = {(float)(rng() % screenWidth),(float)(rng() % screenHeight)};
+       // std::cout << tft.node[i].f << "  " << tft.node[i].val << "\n";
+    }
+
+
+    for (int i = 1 ; i <= sel_n ; i++)
+        for (int j = 1 ; j <= sel_n ; j++) {
+            if (adj[i][j] > 0) {
+              //  std::cout << i << " " << j << " " <<  adj[i][j] << "\n";
+                tft.adj[i][j] = Graph2::egdeee(i,j);
+            }
+            else tft.adj[i][j].f = 0;
+        }
+   // exit(0);
+
+    std::cout << tft.node.size() << "\n";
+
+    Animation.clear();
+    Animatione.clear();
+
+    std::vector<Transforms2> Ani(42);
+
+    std::vector<Transformse> AniE(1600);
+    tft.GetUI(Ani,AniE);
+    Animation.push_back(Ani);
+    Animatione.push_back(AniE);
+
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        UnreAVL.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    TwoTFTree tft2 = tft;
+    UnreAVL.push_back(tft2);
+}
+
+void Graph2::update(){
+
+    tft = TwoTFTree(40);
+    if (sel_n == 0) return ;
+    for (int i = 1 ; i <= sel_n ; i++) {
+        tft.node[i] = Graph2::key(i);
+        tft.node[i].Postion = {(float)(rng() % screenWidth),(float)(rng() % screenHeight)};
+       // std::cout << tft.node[i].f << "  " << tft.node[i].val << "\n";
+    }
+
+    for (int i = 1 ; i <= sel_v ; i++) {
+        int x = rng() % sel_n + 1;
+        int y = rng() % sel_n + 1;
+        while (x == y && sel_n > 1) {
+                y = rng() % sel_n + 1;
+        }
+
+        tft.adj[x][y] =  Graph2::egdeee(x,y);
+    }
+   // exit(0);
+
+    std::cout << tft.node.size() << "\n";
+
+    Animation.clear();
+    Animatione.clear();
+
+    std::vector<Transforms2> Ani(42);
+
+    std::vector<Transformse> AniE(1600);
+    tft.GetUI(Ani,AniE);
+    Animation.push_back(Ani);
+    Animatione.push_back(AniE);
 
     pause = 0;
     pos_ani = 0;
@@ -457,7 +557,7 @@ void Graph::create(int n){
 }
 
 
-void Graph::insert(std::string s){
+void Graph2::insert(std::string s){
     Animation.clear();
     pause = 0;
     pos_ani = 0;
@@ -477,7 +577,7 @@ void Graph::insert(std::string s){
     UnreAVL.push_back(tft2);
  }
 
- void Graph::search(std::string v){
+ void Graph2::search(std::string v){
     Animation.clear();
     pause = 0;
     pos_ani = 0;
@@ -497,7 +597,7 @@ void Graph::insert(std::string s){
     UnreAVL.push_back(tft2);
 }
 
-void Graph::DElete(std::string v){
+void Graph2::DElete(std::string v){
     Animation.clear();
 
     pause = 0;
@@ -520,7 +620,7 @@ void Graph::DElete(std::string v){
 
 
 
-void Graph::Notification(){
+void Graph2::Notification(){
 
     if (!CheckNotification) return ;
     const char *message = "You have reached the node of the tree";

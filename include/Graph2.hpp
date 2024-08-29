@@ -1,6 +1,6 @@
 
-#ifndef Graph_hpp
-#define Graph_hpp
+#ifndef Graph2_hpp
+#define Graph2_hpp
 #include <raylib.h>
 #include <variable.hpp>
 #include <ViewInApp.hpp>
@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 
-class Graph {
+class Graph2 {
 
 private:
     struct Select
@@ -77,8 +77,8 @@ private:
 
                     for (int i = 1 ; i <= n + 1 ; i++){
                         for (int j = 0 ; j <= n ; j++) {
-                            int g = rng() % 3;
-                            if (g < 2 && i != j + 1) {
+                            int g = rng() % 4;
+                            if (g < 1 && i != j + 1) {
                                 a[i][2*j] = rng() % 10 + '0';
                                 a[i][2*j + 1] = ' ';
                             }
@@ -171,18 +171,35 @@ private:
         struct INSERT{
             Vector2 Postion;
             Rectangle Rect;
-            Pointer Pointer_A;
             std::vector <button_select> Item;
-            char a[10];
+            char a[20];
+            int check;
             void init(Vector2 _postion){
                 Postion = _postion;
                 Item.resize(3);
-                Rect = {184,Postion.y,200 + 70,40};
-                Pointer_A.init({239 + 35,506},{3,16});
-                a[0] = '\0';
-                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/S.png"),WHITE);
-                Item[1] = button_select({285 + 70,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
-                Item[2] = button_select({331 + 70,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
+                Rect = {184,Postion.y,200 + 80,40};
+                check = 0;
+                a[0] = 'F';
+                a[1] = 'i';
+                a[2] = 'x';
+                a[3] = 'e';
+                a[4] = 'd';
+                a[5] = ' ';
+                a[6] = 'V';
+                a[7] = 'e';
+                a[8] = 'r';
+                a[9] = 't';
+                a[10] = 'e';
+                a[11] = 'x';
+                a[12] = 's';
+                a[13] = ':';
+                a[14] = ' ';
+                a[15] = 'O';
+                a[16] = 'F';
+                a[17] = 'F';
+                a[18] = '\0';
+                Item[1] = button_select({285 + 85,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
+                Item[2] = button_select({331 + 82,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
             //  Item[0] = button_select({194,Postion.y + 5},{80,29},1,LoadTexture("res/textures/select/N.png"),WHITE);
                 for (button_select &v : Item) {
                     v.image.height /=4;
@@ -202,44 +219,34 @@ private:
                 }
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-
-                    int n = rng() % 6 + 1;
-
-                    for (int i = 0 ; i < n ; i++) a[i] = rng() % 26 + 'a';
-                    a[n] = '\0';
-
+                    check ^= 1;
                 }
 
-                int key = GetCharPressed();
-                while (key > 0) {
-                    if ((((key >= 48) && (key <= 57)) || (key >= 'a' && key <= 'z')) && strlen(a) < 6) {
-                        int len = strlen(a);
-                        a[len] = (char) key;
-                        a[len + 1] = '\0';
-                    }
-
-                    key = GetCharPressed();
+                if (check == 0) {
+                    a[15] = 'O';
+                    a[16] = 'F';
+                    a[17] = 'F';
+                    a[18] = '\0';
+                } else {
+                    a[15] = 'O';
+                    a[16] = 'N';
+                    a[17] = '\0';
+                    a[18] = '\0';
                 }
+                
 
-                if (IsKeyPressed(KEY_BACKSPACE))
-                {
-                    int len = strlen(a);
-                    if (len > 0) a[len - 1] = '\0';
-                }
 
-                Rectangle Rec = {231,Postion.y + 5,42,29};
-                int fontSize = 25;
+                Rectangle Rec = {211,Postion.y + 5,42,29};
+                int fontSize = 20;
 
                 Vector2 textSize = MeasureTextEx(customFont, a, fontSize, 1);
 
                 Vector2 textPosition = {
-                    247,
+                    200,
                     Rec.y + (Rec.height - textSize.y) / 2
                 };
 
                 DrawTextEx(customFont, a, textPosition, fontSize, 1, WHITE);
-                Pointer_A.Postion = {textPosition.x + textSize.x + 3,textPosition.y + 4};
-                Pointer_A.DrawPointer();
             }
 
         };
@@ -415,7 +422,7 @@ private:
                 a[1] = '\0';
                 b[0] = '0';
                 b[1] = '\0';
-                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/I.png"),WHITE);
+                Item[0] = button_select({199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/N.png"),WHITE);
                 Item[1] = button_select({285,Postion.y + 5},{30,30},1,LoadTexture("res/textures/select/Rand.png"),WHITE);
                 Item[2] = button_select({131 + 331,Postion.y + 5},{42,29},1,LoadTexture("res/textures/select/OK.png"),WHITE);
                 Item[3] = button_select({131 + 199,Postion.y + 5},{80,29},0,LoadTexture("res/textures/select/V.png"),WHITE);
@@ -442,7 +449,7 @@ private:
                 bool ggg = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 
                 if (Item[1].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-                    int n = rng() % (LimitNode + 1) - 1;
+                    int n = rng() % 20 + 1;
                     if (n == -1) n = 0;
 
                     a[0] = n / 10 + '0';
@@ -456,7 +463,7 @@ private:
                 }
 
                 if (Item[4].CheckPress(x,1,IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
-                    b[0] = rng() % 10 + '0';
+                    b[0] = rng() % 4 + '0';
                     b[1] = rng() % 10 + '0';
                     b[2] = '\0';
 
@@ -485,8 +492,8 @@ private:
                         int n = 0;
                         for (int i = 0 ; i < strlen(a); i++) n = n*10 + a[i] - '0';
 
-                    if (n > LimitNode) {
-                        n = std::max(0,LimitNode - 1);
+                    if (n > 40) {
+                        n = std::max(0,40 - 1);
                         if (n < 9) {
                             a[0] = n + '0';
                             a[1] = '\0';
@@ -662,26 +669,27 @@ private:
         void init(){
 
             _create.init({184,536});
-            _insert.init({184,576});
+            _insert.init({184,456});
             _search.init({184,616});
             _delete.init({184,656});
             _file.init({184,496});
-           // _update.init({184,656});
+            _update.init({184,576});
             KIND = 1;
-            Postion = {0,496};
-            Close = LoadTexture("res/textures/select/CloseNew.png");
-            Open  = LoadTexture("res/textures/select/OpenNew.png");
+            Postion = {0,456};
+            Close = LoadTexture("res/textures/select/Close.png");
+            Open  = LoadTexture("res/textures/select/Open.png");
             Close.height /=4;
             Close.width /=4;
             Open.height /=4;
             Open.width /=4;
             Textr = Close;
             Size = {(float)Close.width,(float)Close.height};
-            sel.resize(5);
-            sel[0] = choose(Create, Vector2 {27,536},Vector2 {150,40},"Create",ConstColor1,ConstColor2,0);
-            sel[1] = choose(Insert, Vector2 {27,576},Vector2 {150,40},"Insert",ConstColor1,ConstColor2,0);
-            sel[2] = choose(Search, Vector2 {27,616},Vector2 {150,40},"Search",ConstColor1,ConstColor2,0);
-            sel[3] = choose(Delete, Vector2 {27,656},Vector2 {150,40},"Delete",ConstColor1,ConstColor2,0);
+            sel.resize(6);
+            sel[0] = choose(Create, Vector2 {27,536},Vector2 {150,40},"Input",ConstColor1,ConstColor2,0);
+            sel[1] = choose(Update, Vector2 {27,576},Vector2 {150,40},"Create",ConstColor1,ConstColor2,0);
+            sel[2] = choose(Search, Vector2 {27,616},Vector2 {150,40},"Conected C",ConstColor1,ConstColor2,0);
+            sel[3] = choose(Delete, Vector2 {27,656},Vector2 {150,40},"MST",ConstColor1,ConstColor2,0);
+            sel[5] = choose(Insert, Vector2 {27,456},Vector2 {150,40},"Fixed",ConstColor1,ConstColor2,0);
             sel[4] = choose(file, Vector2 {27,496},Vector2 {150,40},"File",ConstColor1,ConstColor2,0);
         }
 
@@ -726,10 +734,16 @@ private:
         int color;
         int val;
         int f;
-        key(char _val = 0) {
+        int pos;
+        Vector2 TotalF;
+
+        key(int _val = 0) {
             Af = 255;
             val = _val;
-            f = -1;
+            f = 0;
+            color = 1;
+            if (val > 0) f = 1;
+            TotalF = {0,0};
         }
     };
 
@@ -739,17 +753,25 @@ private:
         int Ani;
         int color;
         int val;
+        int pos;
+        int f;
+        int x , y;
         egdeee() {
             Af = 0;
             val = 0;
             Ani = 0;
+            f = 0;
+            int x = 0;
+            int y = 0;
         }
-        egdeee(Vector2 PostionA,Vector2 PostionB) {
-            PosX =  PostionA;
-            PosY =  PostionB;
+        egdeee(int _x,int _y) {
             Af = 255;
             val = 0;
             Ani = 0;
+            color = 0;
+            f = 1;
+            x = _x;
+            y = _y;
         }
     };
 
@@ -770,15 +792,183 @@ private:
 
         int capacity;
         int size;
+        Vector2 poscheck;
         std::vector <key> node;
         std::vector <std::vector<egdeee> > adj;
+        int Check;
 
         TwoTFTree(int cap = 0) {
             capacity = cap;
             node.clear();
             adj.clear();
             node.resize(cap + 4);
-          //  adj.resize()
+            adj.assign(cap + 4,(std::vector<egdeee>(cap + 4)));
+            Check = 0;
+        }
+
+        Vector2 toVec(key A,key B) {
+            return {B.Postion.x - A.Postion.x,B.Postion.y - A.Postion.y};
+        }
+
+        float dis(key A, key B) {
+            Vector2 x = {B.Postion.x - A.Postion.x,B.Postion.y - A.Postion.y};
+           // std::cout << x.x << " " << x.y << "\n";
+            return std::max(sqrt(x.x*x.x + x.y*x.y),4.01f);
+        }
+
+        float dis3(Vector2 A) {
+            Vector2 x = {A.x,A.y};
+            return std::max(sqrt(x.x*x.x + x.y*x.y),4.01f);
+        }
+
+        float dis2(key A, key B){
+            return dis(A,B)*dis(A,B);
+        }
+
+        Vector2 Nomal(key A,key B) {
+            Vector2 g = toVec(A,B);
+            return {g.x/dis3(g),g.y/dis3(g)};
+        }
+
+
+        void SetPostion() {
+
+            for (int i = 1 ; i < capacity ; i++) node[i].TotalF = {0,0};
+            for (int i = 1 ; i < capacity ; i++)
+                for (int j = 1 ; j < capacity ; j++){
+                    if (node[i].f == 0 || node[j].f == 0 || i == j) continue;
+                {
+                    
+                    float g = (40000.0f/dis2(node[i],node[j]));
+                    //std::cout << g << "\n";
+                    Vector2 K = Nomal(node[i],node[j]);
+                    K.x *= g;
+                    K.y *= g;
+                    node[i].TotalF.x -= K.x;
+                    node[i].TotalF.y -= K.y;
+
+                    node[j].TotalF.x += K.x;
+                    node[j].TotalF.y += K.y;
+                }
+
+                if ((adj[i][j].f != 0 ||adj[j][i].f != 0) && node[i].f && node[j].f) {
+                    float g2 = log(dis(node[i],node[j])/30.0f);
+                    Vector2 K = Nomal(node[i],node[j]);
+                    K.x *= g2;
+                    K.y *= g2;
+                //    std::cout << i << " " << j << " " << K.x << " " << K.y << "\n";
+                    node[i].TotalF.x += K.x;
+                    node[i].TotalF.y += K.y;
+
+                    node[j].TotalF.x -= K.x;
+                    node[j].TotalF.y -= K.y;
+                }
+                }
+
+            for (int i = 1 ; i < capacity ; i++) 
+                if (node[i].f) {
+                    key Cen;
+                    Cen.Postion = {(float)screenWidth/2,(float)screenHeight/2};
+                    Vector2 K = toVec(node[i],Cen);
+                    K.x *= 0.04f;
+                    K.y *= 0.04f;
+                    node[i].TotalF.x += K.x;
+                    node[i].TotalF.y += K.y;
+                }
+
+            
+            for (int i = 1 ; i < capacity ; i++)
+                for (int j = 1 ; j < capacity ; j++) 
+            if (node[i].f && node[j].f && (adj[i][j].f && adj[i][j].f) && i != j) {
+
+
+                for (int z = 1 ; z < capacity ; z++)   
+                if (node[z].f && z != i && z != j) {
+                    Vector2 mid;
+                    mid.x = (node[i].Postion.x + node[j].Postion.x)/2.0;
+                    mid.y = (node[i].Postion.y + node[j].Postion.y)/2.0;
+
+                    key Cen;
+                    Cen.Postion = mid;
+
+                    float g = (50.0f/(dis(node[z],Cen)*dis(node[z],Cen)));
+                    Vector2 K = Nomal(node[z],Cen);
+                    K.x *= g;
+                    K.y *= g;
+
+                    K.x /= 2.0;
+                    K.y /= 2.0;
+               //     std::cout << K.x << " " << K.y << "\n";
+
+                    node[i].TotalF.x += K.x;
+                    node[i].TotalF.y += K.y;
+
+                    node[j].TotalF.x += K.x;
+                    node[j].TotalF.y += K.y;
+
+                    node[z].TotalF.x -= K.x*2;
+                    node[z].TotalF.y -= K.y*2;
+                }
+            }
+
+            float maxx = 0.0f;
+
+
+            for(int i = 0; i < capacity; i++) if (node[i].f) {
+                maxx = std::max(maxx, std::sqrt(node[i].TotalF.x * node[i].TotalF.x + node[i].TotalF.y * node[i].TotalF.y));
+            }
+
+            if(maxx < 0.1f) return;
+
+            for (int i = 1 ; i < capacity ; i++) if (node[i].f) {
+                node[i].TotalF.x *= 0.99f;
+                node[i].TotalF.y *= 0.99f;
+
+                node[i].Postion.x += node[i].TotalF.x;
+                node[i].Postion.y += node[i].TotalF.y;
+            }
+        }
+
+        void Botton() {
+
+            for (int i = 1 ; i < capacity ; i++) if (node[i].f)
+                if (CheckCollisionPointCircle(GetMousePosition(),node[i].Postion,17) && IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+                    Check = i; 
+                    poscheck = GetMousePosition();
+                    poscheck.x -= node[i].Postion.x;
+                    poscheck.y -= node[i].Postion.y;
+                //   std::cout << gtt << "\n";
+                    break;
+                }
+            
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                Check = 0;
+            }
+
+            if (Check) {
+                key &u = node[Check];
+                Vector2 x = GetMousePosition();
+                x.x -= u.Postion.x;
+                x.y -= u.Postion.y;
+                u.Postion.x += x.x - poscheck.x;
+                u.Postion.y += x.y - poscheck.y;
+            }
+        }
+
+
+        void GetUI(std::vector<Transforms2> &Ani,std::vector<Transformse> &AniE) {
+            for (int i = 1 ; i <= capacity ; i++) {
+                node[i].pos = i;
+                Ani[i].u = Ani[i].v = node[i];
+            }
+
+            int d = 0;
+            for (int i = 1 ; i <= capacity ; i++)
+                for (int j = 1 ; j <= capacity ; j++) {
+                    adj[i][j].pos = d;
+                    AniE[d].u = AniE[d].v = adj[i][j];
+                    d++; 
+                }
         }
 
 
@@ -822,6 +1012,7 @@ public:
     void insert(std::string s);
     void search(std::string v);
     void DElete(std::string v);
+    void update();
     void loadfile();
     void init();
     void draw();
@@ -833,7 +1024,7 @@ public:
     void Notification();
     Vector2 NewPos2D(Vector2 A,Vector2 B,float g);
     float NewPos1D(float x, float y, float g);
-    void DrawAnimation(std::vector<Transforms2> f,double g);
+    void DrawAnimation(std::vector<Transforms2> f,std::vector<Transformse> k,double g);
     void DrawAnimationEdge(std::vector<TransformsEdge> f,double g);
 };
 

@@ -7,7 +7,7 @@
 #include <TTFTree.hpp>
 #include <Trie.hpp>
 #include <Hashtable.hpp>
-#include <Graph.hpp>
+#include <Graph2.hpp>
 #include <iostream>
 
 Menu  menu;
@@ -17,7 +17,7 @@ AVLTree avltree;
 Hashtable hashtable;
 TTFTree ttftree;
 Trie trie;
-Graph graph;
+Graph2 graph;
 
 
 void init(){

@@ -7,6 +7,7 @@
 #include <TTFTree.hpp>
 #include <Trie.hpp>
 #include <Hashtable.hpp>
+#include <Graph.hpp>
 #include <iostream>
 
 Menu  menu;
@@ -16,6 +17,7 @@ AVLTree avltree;
 Hashtable hashtable;
 TTFTree ttftree;
 Trie trie;
+Graph graph;
 
 
 void init(){
@@ -26,6 +28,7 @@ void init(){
     hashtable.init();
     ttftree.init();
     trie.init();
+    graph.init();
 }
 
 void Activities() {
@@ -56,6 +59,11 @@ void Activities() {
             pos = TTFTREE;
             ttftree.init();
         }
+
+        if (x == 5) {
+            pos = GRAPH;
+            graph.init();
+        }
     }
 
     if (pos == HEAPTREE) {
@@ -76,6 +84,10 @@ void Activities() {
 
     if (pos == TRIE) {
         trie.Activity();
+    }
+
+    if (pos == GRAPH) {
+        graph.Activity();
     }
 }
 
@@ -103,5 +115,9 @@ void draw() {
     else if (pos == TRIE) {
         viewapp.draw();
         trie.draw();
+    }
+    else if (pos == GRAPH) {
+        viewapp.draw();
+        graph.draw();
     }
 }

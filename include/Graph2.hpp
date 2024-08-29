@@ -1046,6 +1046,11 @@ private:
                     AnimationE.push_back(AniE);        
                 }
             }
+
+            for (Transforms2 &v : Ani) v.u = v.v;
+            for (Transformse &v : AniE) v.u = v.v;
+            Animation.push_back(Ani);
+            AnimationE.push_back(AniE);  
         }
 
 

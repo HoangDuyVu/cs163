@@ -461,6 +461,76 @@ void Graph2::SelectPress(int pos) {
 }
 
 void Graph2::loadfile() {
+    tft = TwoTFTree(40);
+    std::ifstream fin;
+    fin.open(pathfile);
+    fin >> sel_n;
+    if (sel_n == 0) return ;
+    for (int i = 1 ; i <= sel_n ; i++) {
+        tft.node[i] = Graph2::key(i);
+        tft.node[i].Postion = {(float)(rng() % screenWidth),(float)(rng() % screenHeight)};
+       // std::cout << tft.node[i].f << "  " << tft.node[i].val << "\n";
+    }
+
+    for (int i = 1 ; i <= sel_n ; i++)
+        for (int j = 1 ; j <= sel_n ; j++) {
+            int x;
+            fin >> x;
+
+            if (i >= j) continue;
+
+            if (x > 0) {
+                tft.adj[i][j] =  Graph2::egdeee(i,j,x);
+                tft.adj[j][i] =  Graph2::egdeee(j,i,x);
+                tft.adj[j][i].print = 0;
+            }
+        }
+
+    for (int i = 1 ; i <= sel_v ; i++) {
+        int x = rng() % sel_n + 1;
+        int y = rng() % sel_n + 1;
+        while (x == y && sel_n > 1) {
+                y = rng() % sel_n + 1;
+        }
+
+        int tt = rng() % 100;
+        tft.adj[x][y] =  Graph2::egdeee(x,y,tt);
+        tft.adj[y][x] =  Graph2::egdeee(y,x,tt);
+        tft.adj[y][x].print = 0;
+    }
+
+    fin.close();
+   // exit(0);
+
+  //  std::cout << tft.node.size() << "\n";
+
+    Animation.clear();
+    Animatione.clear();
+
+    std::vector<Transforms2> Ani(42);
+
+    std::vector<Transformse> AniE(1600);
+    tft.GetUI(Ani,AniE);
+    Animation.push_back(Ani);
+    Animatione.push_back(AniE);
+    pause = 0;
+    pos_ani = 0;
+    LastTime = GetTime();
+    TotalTime = 0;
+
+    while (Unre.size() > 0 && Pos_unre + 1 < Unre.size()){
+        Unre.pop_back();
+        Unree.pop_back();
+        UnreAVL.pop_back();
+    }
+
+    Pos_unre++;
+
+    Unre.push_back(Animation);
+    Unree.push_back(Animatione);
+    TwoTFTree tft2 = tft;
+    UnreAVL.push_back(tft2);
+
 }
 
 void Graph2::create(int n){
@@ -485,7 +555,7 @@ void Graph2::create(int n){
         }
    // exit(0);
 
-    std::cout << tft.node.size() << "\n";
+   // std::cout << tft.node.size() << "\n";
 
     Animation.clear();
     Animatione.clear();

@@ -4,13 +4,13 @@
 #include <variable.hpp>
 
 void ViewInApp::init(){
-    Botton.resize(5);
+    Botton.resize(3);
     gtt = -1e8;
     Botton[0] = button_select({0,0},{1440,810},0,(Texture2D) LoadTexture("res/textures/in_app/bg_app.png"),RAYWHITE); 
     Botton[1] = button_select({-100,-4},{220,43},1,(Texture2D) LoadTexture("res/textures/bg/name.png"),RAYWHITE);
-    Botton[2] = button_select({1206,7},{48,48},1,(Texture2D) LoadTexture("res/textures/in_app/return.png"),RAYWHITE);
-    Botton[3] = button_select({1273,10},{56,46},1,(Texture2D) LoadTexture("res/textures/in_app/huongdan.png"),RAYWHITE);
-    Botton[4] = button_select({1348,10},{49,46},1,(Texture2D) LoadTexture("res/textures/in_app/setting.png"),RAYWHITE);
+    Botton[2] = button_select({1348,7},{48,48},1,(Texture2D) LoadTexture("res/textures/in_app/return.png"),RAYWHITE);
+   // Botton[3] = button_select({1273,10},{56,46},1,(Texture2D) LoadTexture("res/textures/in_app/huongdan.png"),RAYWHITE);
+   // Botton[4] = button_select({1348,10},{49,46},1,(Texture2D) LoadTexture("res/textures/in_app/setting.png"),RAYWHITE);
   //  Botton[5] = button_select({27,741},{48,52},1,(Texture2D) LoadTexture("res/textures/in_app/undo.png"),RAYWHITE);
    // Botton[6] = button_select({102,741},{49,52},1,(Texture2D) LoadTexture("res/textures/in_app/redo.png"),RAYWHITE);
    // Botton[7] = button_select({237,750},{49,45},1,(Texture2D) LoadTexture("res/textures/in_app/pre.png"),RAYWHITE);
@@ -40,6 +40,56 @@ void ViewInApp::draw(){
         else v.col = 0;
         v.DrawBasic(0.7);
     }
+
+    const char * A = "Heap Tree";
+    const char * B = "AVL Tree";
+    const char * C = "234 Tree";
+    const char * D = "Trie";
+    const char * E = "Hash Table";
+    const char * F = "Graph";
+    int fontSize = 40;
+    if (pos == HEAPTREE) {
+        Vector2 textSize = MeasureTextEx(customFont, A, fontSize, 1);
+        Vector2 Postion = {screenWidth/2.0f - textSize.x/2.0f,14};
+        DrawTextEx(customFont,A,Postion,fontSize,1.0f,WHITE);
+    }
+
+    if (pos == HEAPTREE) {
+        Vector2 textSize = MeasureTextEx(customFont, A, fontSize, 1);
+        Vector2 Postion = {screenWidth/2.0f - textSize.x/2.0f,14};
+        DrawTextEx(customFont,A,Postion,fontSize,1.0f,WHITE);
+    }
+
+    if (pos == AVLTREE) {
+        Vector2 textSize = MeasureTextEx(customFont, B, fontSize, 1);
+        Vector2 Postion = {screenWidth/2.0f - textSize.x/2.0f,14};
+        DrawTextEx(customFont,B,Postion,fontSize,1.0f,WHITE);
+    }
+
+    if (pos == TTFTREE) {
+        Vector2 textSize = MeasureTextEx(customFont, C, fontSize, 1);
+        Vector2 Postion = {screenWidth/2.0f - textSize.x/2.0f,14};
+        DrawTextEx(customFont,C,Postion,fontSize,1.0f,WHITE);
+    }
+
+    if (pos == TRIE) {
+        Vector2 textSize = MeasureTextEx(customFont, D, fontSize, 1);
+        Vector2 Postion = {screenWidth/2.0f - textSize.x/2.0f,14};
+        DrawTextEx(customFont,D,Postion,fontSize,1.0f,WHITE);
+    }
+
+    if (pos == HASHTABLE) {
+        Vector2 textSize = MeasureTextEx(customFont, E, fontSize, 1);
+        Vector2 Postion = {screenWidth/2.0f - textSize.x/2.0f,14};
+        DrawTextEx(customFont,E,Postion,fontSize,1.0f,WHITE);
+    }
+
+    if (pos == GRAPH) {
+        Vector2 textSize = MeasureTextEx(customFont, F, fontSize, 1);
+        Vector2 Postion = {screenWidth/2.0f - textSize.x/2.0f,14};
+        DrawTextEx(customFont,F,Postion,fontSize,1.0f,WHITE);
+    }
+    
 
     Speed.DrawBasic(1);
     NodeSpeed.DrawBasic(1);

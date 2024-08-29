@@ -30,6 +30,8 @@ int Menu::UpdatePressOn(){
 }
 
 void Menu::draw(){
+
+    
     Vector2 Mouse = GetMousePosition();
     for (button_select v : Botton) {
         if (v.CheckMouse(Mouse,10)) v.col = 1;

@@ -12,6 +12,7 @@ class Menu {
 
 private:
     std::vector <button_select> Botton;
+    
 public:
     void init();
     void draw();

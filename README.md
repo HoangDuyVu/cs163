@@ -14,9 +14,7 @@ cmake --build build
 
 ### run
 ``` bash
-./build/run
-or
-build/run.exe
+./build/bin/game
 ```
 
 
